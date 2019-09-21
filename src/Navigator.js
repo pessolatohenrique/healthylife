@@ -94,6 +94,7 @@ const AuthNavigator = createStackNavigator({
     screen: ({ navigation }) => <SignIn navigation={navigation} />,
     navigationOptions: () => ({
       title: 'SignIn',
+      header: null,
       headerTintColor: '#fff',
       headerStyle: commonStyle.header,
     }),

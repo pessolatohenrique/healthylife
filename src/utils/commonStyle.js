@@ -44,4 +44,11 @@ export default StyleSheet.create({
   colorTheme: {
     color: MAIN_COLOR,
   },
+  backgroundImage: {
+    flex: 1,
+    width: null,
+    height: null,
+  },
+  regularInput: { backgroundColor: '#ffffff', marginBottom: 10 },
+  containerMargin: { marginLeft: 10, marginRight: 10 },
 });
