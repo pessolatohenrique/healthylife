@@ -1,4 +1,4 @@
-package com.ftdempilhadeiram;
+package com.healthylife;
 
 import android.app.Application;
 

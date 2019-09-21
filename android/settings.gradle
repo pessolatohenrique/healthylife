@@ -1,4 +1,4 @@
-rootProject.name = 'ftdempilhadeiram'
+rootProject.name = 'healthylife'
 include ':realm'
 project(':realm').projectDir = new File(rootProject.projectDir, '../node_modules/realm/android')
 include ':react-native-vector-icons'
