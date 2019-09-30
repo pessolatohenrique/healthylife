@@ -16,3 +16,4 @@ export const CHART_COLORS = [
   '#87CEFA',
   '#3CB371',
 ];
+export const REQUIRED_MESSAGE = 'Campo de preenchimento obrigatório';

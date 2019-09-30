@@ -51,7 +51,7 @@ const HomeStack = createStackNavigator({
               { cancelable: false },
             );
           }}
-          style={{ paddingRight: 10, paddingTop: 20 }}
+          style={{ paddingRight: 10, paddingTop: 15 }}
         >
           <Icon name="sign-out-alt" size={20} color="white" />
         </Button>

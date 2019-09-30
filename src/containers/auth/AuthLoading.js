@@ -5,6 +5,7 @@ import { Container, Content } from 'native-base';
 import PropTypes from 'prop-types';
 import commonStyle from '../../utils/commonStyle';
 import CustomLoader from '../../components/CustomLoader';
+import { configureAxios } from '../../config/axios';
 
 class AuthLoading extends React.Component {
   constructor(props) {
@@ -16,6 +17,8 @@ class AuthLoading extends React.Component {
   fetchToken = async () => {
     const userToken = await AsyncStorage.getItem('token');
     const { navigation } = this.props;
+
+    await configureAxios();
 
     // This will switch to the App screen or Auth screen and this loading
     // screen will be unmounted and thrown away.

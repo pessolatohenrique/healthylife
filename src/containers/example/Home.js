@@ -24,7 +24,7 @@ class Home extends Component {
     const { list } = product;
     createProduct({ id: Math.floor(Math.random() * 1000), name: 'Course of PHP 7.1' }, list);
 
-    configureAxios();
+    // configureAxios();
 
     axios
       .get('/products')

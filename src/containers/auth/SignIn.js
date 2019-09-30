@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { AsyncStorage, Image, View } from 'react-native';
+import { AsyncStorage, Image, View, Keyboard } from 'react-native';
 import {
-  Container, Content, Form, Item, Input, Label, Text, Button,
+  Item, Input, Text, Button,
 } from 'native-base';
 import PropTypes from 'prop-types';
 import { withFormik } from 'formik';
@@ -9,12 +9,16 @@ import * as Yup from 'yup';
 import commonStyle from '../../utils/commonStyle';
 import CustomLoader from '../../components/CustomLoader';
 import ViewBackground from '../../components/ViewBackground';
+import { login } from './functions';
+import { showToast } from '../../utils/errors';
+import { REQUIRED_MESSAGE } from '../../constants/general';
 
 class SignIn extends Component {
-  login = async () => {
-    const { navigation } = this.props;
-    await AsyncStorage.setItem('token', 'abc');
-    navigation.navigate('App');
+  componentDidUpdate = (prevProps) => {
+    const { errors } = this.props;
+    if (prevProps.errors.message !== errors.message && errors.message) {
+      showToast(errors.message);
+    }
   };
 
   render() {
@@ -51,6 +55,7 @@ class SignIn extends Component {
               value={password}
               secureTextEntry
               onChangeText={text => setFieldValue('password', text)}
+              onSubmitEditing={handleSubmit}
             />
           </Item>
           {errors.password && <Text style={commonStyle.error}>{errors.password}</Text>}
@@ -65,7 +70,6 @@ class SignIn extends Component {
 }
 
 SignIn.propTypes = {
-  navigation: PropTypes.object.isRequired,
   values: PropTypes.object.isRequired,
   setFieldValue: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
@@ -76,17 +80,28 @@ SignIn.propTypes = {
 export default withFormik({
   mapPropsToValues: () => ({ username: '', password: '' }),
   validationSchema: Yup.object().shape({
-    username: Yup.string().required('Campo de preenchimento obrigatório'),
-    password: Yup.string()
-      .min(6, 'A senha deve ter no mínimo 6 caracteres')
-      .required('Campo de preenchimento obrigatório'),
+    username: Yup.string().required(REQUIRED_MESSAGE),
+    password: Yup.string().required(REQUIRED_MESSAGE),
   }),
 
-  handleSubmit: (values, actions) => {
-    setTimeout(() => {
-      console.tron.log('Values from form', values);
-      actions.setSubmitting(false);
-      actions.setErrors({ message: 'Demonstrando erros no formik' });
-    }, 1000);
+  handleSubmit: async (values, actions) => {
+    const { username, password } = values;
+    const { props } = actions;
+    const { navigation } = props;
+
+    Keyboard.dismiss();
+
+    const response = await login(username, password);
+
+    actions.setSubmitting(false);
+
+    if (response.error) {
+      actions.setErrors({ message: response.error });
+      return true;
+    }
+
+    await AsyncStorage.setItem('token', response);
+    navigation.navigate('App');
+    return true;
   },
 })(SignIn);
