@@ -10,7 +10,7 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import commonStyle from './utils/commonStyle';
-import Home from './containers/example/Home';
+import Home from './containers/dashboard/DashboardContainer';
 import Register from './containers/form/Register';
 import ListExample from './containers/exampleRealm/ListExample';
 import CustomHeaderSearch from './components/CustomHeaderSearch';
