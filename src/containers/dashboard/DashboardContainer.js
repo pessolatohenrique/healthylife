@@ -1,23 +1,13 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-
 import {
-  Container, Content, Card, CardItem, Text, Body, View,
+  Container, Content, Card, CardItem, Text, Body,
 } from 'native-base';
 import * as Progress from 'react-native-progress';
 
-import PropTypes from 'prop-types';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { connect } from 'react-redux';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { bindActionCreators } from 'redux';
 import PieChartComponent from '../../components/PieChartComponent';
-import BarChartComponent from '../../components/BarChartComponent';
 import commonStyle from '../../utils/commonStyle';
 
-import { create } from '../../actions/product';
 import LineChartComponent from '../../components/LineChartComponent';
-import styles from './styles';
 
 class DashboardContainer extends Component {
   render() {
@@ -30,14 +20,15 @@ class DashboardContainer extends Component {
             </CardItem>
             <CardItem bordered>
               <Body style={commonStyle.containerCenter}>
-                <Progress.Circle 
-                  size={140} 
-                  progress={0.6} 
-                  showsText  
-                  formatText={(progress) => `60%`}
+                <Progress.Circle
+                  size={140}
+                  progress={0.6}
+                  showsText
+                  // eslint-disable-next-line no-unused-vars
+                  formatText={progress => '60%'}
                   textStyle={{ fontSize: 28 }}
                   borderWidth={2}
-                  />
+                />
               </Body>
             </CardItem>
             <CardItem footer bordered>
@@ -47,17 +38,18 @@ class DashboardContainer extends Component {
 
           <Card>
             <CardItem header bordered>
-              <Text style={commonStyle.colorTheme}>Bar chart example</Text>
+              <Text style={commonStyle.colorTheme}>Calorias por refeição</Text>
             </CardItem>
             <CardItem bordered>
               <Body>
-                <BarChartComponent
+                <PieChartComponent
+                  isPorcentage
                   data={[
-                    { name: 'January', value: 50 },
-                    { name: 'February', value: 100 },
-                    { name: 'March', value: 230 },
-                    { name: 'April', value: 280 },
-                    { name: 'May', value: 210 },
+                    { name: 'Café da manhã', value: 50 },
+                    { name: 'Lanche da manhã', value: 100 },
+                    { name: 'Almoço', value: 230 },
+                    { name: 'Café da tarde', value: 280 },
+                    { name: 'Jantar', value: 210 },
                   ]}
                 />
               </Body>
@@ -66,20 +58,23 @@ class DashboardContainer extends Component {
 
           <Card>
             <CardItem header bordered>
-              <Text style={commonStyle.colorTheme}>Line chart example</Text>
+              <Text style={commonStyle.colorTheme}>Histórico de peso</Text>
             </CardItem>
             <CardItem bordered>
               <Body>
                 <LineChartComponent
                   data={[
-                    { name: 'January', value: 50 },
-                    { name: 'February', value: 100 },
-                    { name: 'March', value: 230 },
-                    { name: 'April', value: 280 },
-                    { name: 'May', value: 210 },
+                    { name: '01/10', value: 50 },
+                    { name: '08/10', value: 100 },
+                    { name: '15/10', value: 230 },
+                    { name: '22/10', value: 280 },
+                    { name: '29/10', value: 210 },
                   ]}
                 />
               </Body>
+            </CardItem>
+            <CardItem footer bordered>
+              <Text style={commonStyle.colorTheme}>Índice de massa corporal: eutrofia</Text>
             </CardItem>
           </Card>
         </Content>
