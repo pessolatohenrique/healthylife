@@ -1,4 +1,5 @@
 import env from 'react-native-config';
+import { AsyncStorage } from 'react-native';
 import axios from 'axios';
 
 const config = {
@@ -8,17 +9,12 @@ const config = {
   },
 };
 
-const configureAxios = () => {
+const configureAxios = async () => {
   axios.defaults.baseURL = env.API_HOST;
   axios.defaults.headers.post['Content-Type'] = 'application/json';
   axios.defaults.headers.post.Accept = 'application/json';
-  // axios.defaults.headers.common.Authorization = 'Bearer 123456';
+  axios.defaults.headers.common.Authorization = `Bearer ${await AsyncStorage.getItem('token')}`;
 };
-
-// axios.defaults.headers.post['Content-Type'] = 'application/json';
-
-// colocar no login
-// instance.defaults.headers.common['Authorization'] = AUTH_TOKEN;
 
 const API_HOST = config.api.host;
 

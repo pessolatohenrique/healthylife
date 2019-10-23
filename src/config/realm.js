@@ -1,42 +1,23 @@
 import Realm from 'realm';
 
 // Define your models and their properties
-// language.category = { name: 'Backend' }
-const LanguageSchema = {
-  name: 'Language',
+const IndicativeSchema = {
+  name: 'Indicative',
   primaryKey: 'id',
   properties: {
     id: { type: 'int', indexed: true },
-    category: 'Category',
-    name: 'string',
-    description: 'string',
-    image: 'string',
-    created_at: 'date',
-    updated_at: 'date',
-  },
-};
-
-/* categoryList.push({
-    name: 'PHP',
-    description: 'Atualmente está na versão 7.1',
-    image: 'uma imagem aqui'}),
-    created_at: new Date(),
-    updated_at: new Date()
-*/
-const CategorySchema = {
-  name: 'Category',
-  languages: 'Language[]',
-  primaryKey: 'id',
-  properties: {
-    id: { type: 'int', indexed: true },
-    name: 'string',
+    imc: 'float',
+    imc_classification: 'string',
+    diet_value: 'int',
+    consumed: 'float',
+    consumed_percentage: 'float',
     created_at: 'date',
     updated_at: 'date',
   },
 };
 
 const getRealm = () => Realm.open({
-  schema: [LanguageSchema, CategorySchema],
+  schema: [IndicativeSchema],
 }).catch(error => console.tron.error('Error realm open', error));
 
-export { LanguageSchema, CategorySchema, getRealm };
+export { IndicativeSchema, getRealm };

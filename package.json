@@ -12,6 +12,7 @@
     "eslint": "4.19.1",
     "formik": "1.5.8",
     "install": "0.12.2",
+    "moment": "^2.24.0",
     "native-base": "2.13.5",
     "npm": "6.11.2",
     "prop-types": "15.7.2",

@@ -12,7 +12,7 @@ export const getErrorMessage = (error) => {
   const { data } = response;
   let finalMessage = 'Ops! Algo deu errado';
 
-  if (data[0].message) {
+  if (data[0] && data[0].message) {
     finalMessage = data[0].message;
   }
 
