@@ -8,9 +8,9 @@ import PieChartComponent from '../../components/PieChartComponent';
 import commonStyle from '../../utils/commonStyle';
 
 import LineChartComponent from '../../components/LineChartComponent';
-import { getUserCalculate } from './functions';
+import { getUserCalculate, insert } from './functions';
 import { showToast } from '../../utils/errors';
-import { getRealm } from "../../config/realm";
+import { getRealm } from '../../config/realm';
 
 class DashboardContainer extends Component {
   componentDidMount = async () => {
@@ -22,7 +22,11 @@ class DashboardContainer extends Component {
       showToast(data.error);
     }
 
-    console.tron.log("final data", data);
+    const inserted = await insert(realm, data);
+
+    if (inserted && inserted.error) {
+      showToast(data.error);
+    }
   };
 
   render() {

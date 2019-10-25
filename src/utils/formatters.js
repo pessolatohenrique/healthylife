@@ -14,5 +14,5 @@ export const formatDecimalToNumber = (strMoney) => {
       .trim();
   }
 
-  return formatedValue;
+  return parseFloat(formatedValue.toFixed(2));
 };
