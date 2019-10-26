@@ -4,6 +4,9 @@ import Moment from 'moment';
 import { getErrorMessage } from '../../utils/errors';
 import { formatDecimalToNumber } from '../../utils/formatters';
 
+/**
+ * obtem os dados calculados, fornecidos pela API
+ */
 export const getUserCalculate = async () => {
   let finalData = null;
 
@@ -18,38 +21,94 @@ export const getUserCalculate = async () => {
   return finalData;
 };
 
-export const insert = (realm, data) => {
-  const finalData = Object.assign({}, realm);
-  try {
-    realm.write(() => {
-      const {
-        imc,
-        classificacao_imc,
-        valor_dieta,
-        total_consumido,
-        total_consumido_porcentagem,
-      } = data;
+/**
+ * verifica se um registro existe na base de dados local
+ * @param {Object} realm informações do realm database
+ * @param {Object} data dados encontrados
+ * @return {Array} hasChanged dado encontrado ou array vazio
+ */
+export const verifyExists = (realm, data) => {
+  const hasChanged = realm
+    .objects('Indicative')
+    .filtered(
+      `imc = '${formatDecimalToNumber(
+        data.imc,
+      )}' AND consumed_percentage = '${formatDecimalToNumber(data.total_consumido_porcentagem)}'`,
+    )
+    .sorted('id');
 
-      if (classificacao_imc) {
-        realm.create(
-          'Indicative',
-          {
-            id: Moment().unix(),
-            imc: formatDecimalToNumber(imc),
-            imc_classification: classificacao_imc,
-            diet_value: valor_dieta,
-            consumed: formatDecimalToNumber(total_consumido),
-            consumed_percentage: formatDecimalToNumber(total_consumido_porcentagem),
-            created_at: new Date(),
-            updated_at: new Date(),
-          },
-          true,
-        );
-      }
-    });
-  } catch (error) {
-    // finalData = Object.assign({ error: getErrorMessage(error) });
+  return hasChanged;
+};
+
+/**
+ * cria o objeto a ser salvo
+ * @param {Object} data dados retornados da API
+ * @return {Object} objeto mapeado a ser salvo
+ */
+export const createObject = (data) => {
+  const {
+    imc,
+    classificacao_imc,
+    valor_dieta,
+    total_consumido,
+    total_consumido_porcentagem,
+  } = data;
+
+  const objectToSave = {
+    id: Moment().unix(),
+    imc: formatDecimalToNumber(imc),
+    imc_classification: classificacao_imc,
+    diet_value: valor_dieta,
+    consumed: formatDecimalToNumber(total_consumido),
+    consumed_percentage: formatDecimalToNumber(total_consumido_porcentagem),
+    created_at: new Date(),
+    updated_at: new Date(),
+  };
+
+  return objectToSave;
+};
+
+/**
+ * realiza a inserção na base de dados local
+ * @param {Object} realm informações do realm database
+ * @param {Object} data dados encontrados
+ * @return {Object} finalData dados relacionados à base
+ */
+export const insert = (realm, data) => {
+  let finalData = Object.assign({}, realm);
+
+  const hasChanged = verifyExists(realm, data);
+
+  if (hasChanged.length === 0) {
+    try {
+      realm.write(() => {
+        const objectToSave = createObject(data);
+
+        realm.create('Indicative', objectToSave, true);
+      });
+    } catch (error) {
+      finalData = Object.assign({ error: 'Ops! Erro na inserção de dados' });
+    }
   }
 
   return finalData;
+};
+
+/**
+ * obtem o último resultado da tabela
+ * @param {Object} realm informações do realm database
+ * @return {Object} lastResult informações do último resultado, ou vazio
+ */
+export const getLastResult = (realm) => {
+  let lastResult = [];
+  const lastResultQuery = realm
+    .objects('Indicative')
+    .sorted('id', true)
+    .slice(0, 1);
+  if (lastResultQuery && lastResultQuery[0]) {
+    const lastTmp = lastResultQuery[0];
+    lastResult = lastTmp;
+  }
+
+  return lastResult;
 };

@@ -18,3 +18,12 @@ export const getErrorMessage = (error) => {
 
   return finalMessage;
 };
+
+export const verifyShowError = (data) => {
+  if (data && data.error) {
+    showToast(data.error);
+    return true;
+  }
+
+  return false;
+};

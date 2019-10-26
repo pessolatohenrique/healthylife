@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable camelcase */
 import React, { Component } from 'react';
 import {
   Container, Content, Card, CardItem, Text, Body,
@@ -8,28 +10,49 @@ import PieChartComponent from '../../components/PieChartComponent';
 import commonStyle from '../../utils/commonStyle';
 
 import LineChartComponent from '../../components/LineChartComponent';
-import { getUserCalculate, insert } from './functions';
-import { showToast } from '../../utils/errors';
+import { getUserCalculate, insert, getLastResult } from './functions';
+import { verifyShowError } from '../../utils/errors';
 import { getRealm } from '../../config/realm';
 
 class DashboardContainer extends Component {
-  componentDidMount = async () => {
+  constructor(props) {
+    super(props);
+    this.state = {
+      indicators: {
+        consumed_percentage: 0,
+        diet_value: 0,
+        consumed: 0,
+        imc_classification: '#N/D',
+      },
+    };
+  }
+
+  loadIndicators = async () => {
     // verificar se está online
     const data = await getUserCalculate();
     const realm = await getRealm();
 
-    if (data && data.error) {
-      showToast(data.error);
-    }
+    if (verifyShowError(data)) return;
 
     const inserted = await insert(realm, data);
 
-    if (inserted && inserted.error) {
-      showToast(data.error);
-    }
+    if (verifyShowError(inserted)) return;
+
+    this.setState({
+      indicators: getLastResult(realm),
+    });
+  };
+
+  componentDidMount = async () => {
+    this.loadIndicators();
   };
 
   render() {
+    const { indicators } = this.state;
+    const {
+      consumed_percentage, diet_value, consumed, imc_classification,
+    } = indicators;
+
     return (
       <Container>
         <Content padder>
@@ -41,17 +64,26 @@ class DashboardContainer extends Component {
               <Body style={commonStyle.containerCenter}>
                 <Progress.Circle
                   size={140}
-                  progress={0.6}
+                  progress={consumed_percentage / 100}
                   showsText
-                  // eslint-disable-next-line no-unused-vars
-                  formatText={progress => '60%'}
+                  formatText={progress => `${consumed_percentage}%`}
                   textStyle={{ fontSize: 28 }}
                   borderWidth={2}
                 />
               </Body>
             </CardItem>
             <CardItem footer bordered>
-              <Text style={commonStyle.colorTheme}>Você consumiu 1400 de 2800 calorias!</Text>
+              <Text style={commonStyle.colorTheme}>
+                Você consumiu
+                {' '}
+                {consumed}
+                {' '}
+de
+                {' '}
+                {diet_value}
+                {' '}
+calorias!
+              </Text>
             </CardItem>
           </Card>
 
@@ -93,7 +125,11 @@ class DashboardContainer extends Component {
               </Body>
             </CardItem>
             <CardItem footer bordered>
-              <Text style={commonStyle.colorTheme}>Índice de massa corporal: eutrofia</Text>
+              <Text style={commonStyle.colorTheme}>
+                Índice de massa corporal:
+                {' '}
+                {imc_classification}
+              </Text>
             </CardItem>
           </Card>
         </Content>
