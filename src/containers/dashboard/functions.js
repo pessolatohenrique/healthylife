@@ -108,8 +108,6 @@ export const getLastResult = (realm) => {
     .sorted('id', true)
     .slice(0, 1);
 
-  console.tron.log('all results', realm.objects('Indicative').sorted('id', true));
-
   if (lastResultQuery && lastResultQuery[0]) {
     const lastTmp = lastResultQuery[0];
     lastResult = lastTmp;

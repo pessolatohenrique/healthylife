@@ -11,6 +11,7 @@ import commonStyle from '../../utils/commonStyle';
 
 import LineChartComponent from '../../components/LineChartComponent';
 import { getUserCalculate, insert, getLastResult } from './functions';
+import { loadMealTypeFlow } from '../mealType/functions';
 import { verifyShowError } from '../../utils/errors';
 import { getRealm } from '../../config/realm';
 
@@ -43,9 +44,18 @@ class DashboardContainer extends Component {
     });
   };
 
+  /*
+    realiza o carregamento de informações complementares ao sistema
+    por exemplo: tipos de refeição
+  */
+  loadComplementars = async () => {
+    await loadMealTypeFlow();
+  };
+
   componentDidMount = async () => {
-    this.loadIndicators();
-    //this.loadCharts();
+    await this.loadIndicators();
+    await this.loadComplementars();
+    // this.loadCharts();
   };
 
   render() {
