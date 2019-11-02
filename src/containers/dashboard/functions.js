@@ -31,9 +31,11 @@ export const verifyExists = (realm, data) => {
   const hasChanged = realm
     .objects('Indicative')
     .filtered(
-      `imc = '${formatDecimalToNumber(
-        data.imc,
-      )}' AND consumed_percentage = '${formatDecimalToNumber(data.total_consumido_porcentagem)}'`,
+      'imc = $0 AND consumed_percentage = $1 AND created_at >= $2 AND created_at <= $3',
+      formatDecimalToNumber(data.imc),
+      formatDecimalToNumber(data.total_consumido_porcentagem),
+      `${Moment().format('YYYY-MM-DD')}T00:00:00`,
+      `${Moment().format('YYYY-MM-DD')}T23:59:00`,
     )
     .sorted('id');
 
@@ -105,6 +107,9 @@ export const getLastResult = (realm) => {
     .objects('Indicative')
     .sorted('id', true)
     .slice(0, 1);
+
+  console.tron.log('all results', realm.objects('Indicative').sorted('id', true));
+
   if (lastResultQuery && lastResultQuery[0]) {
     const lastTmp = lastResultQuery[0];
     lastResult = lastTmp;

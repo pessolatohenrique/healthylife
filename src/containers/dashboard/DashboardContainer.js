@@ -45,6 +45,7 @@ class DashboardContainer extends Component {
 
   componentDidMount = async () => {
     this.loadIndicators();
+    //this.loadCharts();
   };
 
   render() {

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { AsyncStorage, Image, View, Keyboard } from 'react-native';
+import {
+  AsyncStorage, Image, View, Keyboard,
+} from 'react-native';
 import {
   Item, Input, Text, Button,
 } from 'native-base';
