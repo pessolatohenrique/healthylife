@@ -27,8 +27,21 @@ const MealTypeSchema = {
   },
 };
 
+const MealSchema = {
+  name: 'Meal',
+  primaryKey: 'id',
+  properties: {
+    id: { type: 'int', indexed: true },
+    meal_type: { type: 'MealType' },
+    consumed_at: 'string',
+    calories_total: 'double',
+    created_at: 'date',
+    updated_at: 'date',
+  },
+};
+
 const getRealm = () => Realm.open({
-  schema: [IndicativeSchema, MealTypeSchema],
+  schema: [IndicativeSchema, MealTypeSchema, MealSchema],
 }).catch(error => console.tron.error('Error realm open', error));
 
 export { IndicativeSchema, getRealm };

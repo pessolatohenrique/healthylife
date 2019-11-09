@@ -15,6 +15,8 @@ import commonStyle from '../../utils/commonStyle';
 import LineChartComponent from '../../components/LineChartComponent';
 import { getUserCalculate, insert, getLastResult } from './functions';
 import { loadMealTypeFlow } from '../mealType/functions';
+import { getCalculateCalories, bulkInsert as insertMealReport } from '../meal/functions';
+
 import { verifyShowError } from '../../utils/errors';
 import { getRealm } from '../../config/realm';
 import { setList as setMealTypes } from '../../actions/mealType';
@@ -59,9 +61,30 @@ class DashboardContainer extends Component {
     onSetMeals(meals);
   };
 
+  loadMealReport = async () => {
+    const { mealTypeList } = this.props;
+    const data = await getCalculateCalories(mealTypeList);
+    const realm = await getRealm();
+
+    await insertMealReport(realm, data);
+
+    console.tron.log(realm.objects('Meal').sorted('id'));
+    // set state com o result
+  };
+
   componentDidMount = async () => {
+    // const realm = await getRealm();
+    // const result = realm.objects('Meal').sorted('id');
+
+    // realm.write(() => {
+    //   realm.delete(result);
+    // });
+    // console.tron.log(realm.objects('Meal').sorted('id'));
+    // return;
+
     await this.loadIndicators();
     await this.loadComplementars();
+    await this.loadMealReport();
   };
 
   render() {
@@ -157,6 +180,7 @@ calorias!
 
 DashboardContainer.propTypes = {
   onSetMeals: PropTypes.func.isRequired,
+  mealTypeList: PropTypes.array.isRequired,
 };
 
 const mapStateToProps = state => ({
