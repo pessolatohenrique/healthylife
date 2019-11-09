@@ -1,3 +1,4 @@
+/* eslint-disable react/no-did-update-set-state */
 import React from 'react';
 import { Dimensions } from 'react-native';
 import { PieChart } from 'react-native-chart-kit';
@@ -12,19 +13,21 @@ class PieChartComponent extends React.Component {
     };
   }
 
-  componentDidMount() {
+  componentDidUpdate(prevProps) {
     const { data } = this.props;
-    const dataMaped = [...data].map((item, index) => {
-      const itemNew = {
-        ...item,
-        color: CHART_COLORS[index],
-        legendFontColor: LEGEND_PIE_COLOR,
-        legendFontSize: LEGEND_PIE_FONT_SIZE,
-      };
-      return itemNew;
-    });
+    if (data !== prevProps.data) {
+      const dataMaped = [...data].map((item, index) => {
+        const itemNew = {
+          ...item,
+          color: CHART_COLORS[index],
+          legendFontColor: LEGEND_PIE_COLOR,
+          legendFontSize: LEGEND_PIE_FONT_SIZE,
+        };
+        return itemNew;
+      });
 
-    this.setState({ dataMaped });
+      this.setState({ dataMaped });
+    }
   }
 
   render() {

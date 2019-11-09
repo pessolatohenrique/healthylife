@@ -1,6 +1,6 @@
+/* eslint-disable radix */
 import Moment from 'moment';
 import { getRequest } from '../../utils/request';
-import { getRealm } from '../../config/realm';
 import { verifyShowError } from '../../utils/errors';
 
 /**
@@ -20,7 +20,7 @@ export const mapList = (data, mealTypes) => {
       let itemCopy = Object.assign({}, item);
       itemCopy = {
         ...itemCopy,
-        id: `${Moment().unix()}${currentMealType.id}`,
+        id: parseInt(`${Moment().unix()}${currentMealType.id}`),
         meal_type: currentMealType,
         consumed_at: item.horario_consumo,
         calories_total: parseFloat(item.calorias_total),
@@ -40,6 +40,11 @@ export const mapList = (data, mealTypes) => {
   return finalDataMaped;
 };
 
+export const mapToChart = data => [...data].map(item => Object.assign({
+  name: item.meal_type.description,
+  value: item.calories_total,
+}));
+
 /**
  * obtem a listagem de tipos de refeição
  * @return {Array} finalData tipos de refeição
@@ -55,9 +60,13 @@ export const getCalculateCalories = async (mealTypeList) => {
 };
 
 export const insertReport = (realm, data) => {
-  realm.write(() => {
-    realm.create('Meal', data);
-  });
+  try {
+    realm.write(() => {
+      realm.create('Meal', data);
+    });
+  } catch (error) {
+    // console.tron.log('error on creation', error.message);
+  }
 
   return true;
 };
@@ -88,8 +97,6 @@ export const bulkInsert = async (realm, data) => {
   try {
     const promises = [...data].map(async (item) => {
       const resultExists = await verifyExists(realm, item);
-
-      console.tron.log('exists?', resultExists);
 
       if (resultExists.length === 0) {
         await insertReport(realm, item);

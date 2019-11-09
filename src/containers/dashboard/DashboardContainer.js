@@ -15,7 +15,11 @@ import commonStyle from '../../utils/commonStyle';
 import LineChartComponent from '../../components/LineChartComponent';
 import { getUserCalculate, insert, getLastResult } from './functions';
 import { loadMealTypeFlow } from '../mealType/functions';
-import { getCalculateCalories, bulkInsert as insertMealReport } from '../meal/functions';
+import {
+  getCalculateCalories,
+  bulkInsert as insertMealReport,
+  mapToChart as mapChartMeal,
+} from '../meal/functions';
 
 import { verifyShowError } from '../../utils/errors';
 import { getRealm } from '../../config/realm';
@@ -30,6 +34,7 @@ class DashboardContainer extends Component {
         diet_value: 0,
         consumed: 0,
         imc_classification: '#N/D',
+        meals_data: [],
       },
     };
   }
@@ -68,27 +73,18 @@ class DashboardContainer extends Component {
 
     await insertMealReport(realm, data);
 
-    console.tron.log(realm.objects('Meal').sorted('id'));
-    // set state com o result
+    const mealsData = realm.objects('Meal').sorted('id');
+    this.setState({ meals_data: mapChartMeal(mealsData) });
   };
 
   componentDidMount = async () => {
-    // const realm = await getRealm();
-    // const result = realm.objects('Meal').sorted('id');
-
-    // realm.write(() => {
-    //   realm.delete(result);
-    // });
-    // console.tron.log(realm.objects('Meal').sorted('id'));
-    // return;
-
     await this.loadIndicators();
     await this.loadComplementars();
     await this.loadMealReport();
   };
 
   render() {
-    const { indicators } = this.state;
+    const { indicators, meals_data } = this.state;
     const {
       consumed_percentage, diet_value, consumed, imc_classification,
     } = indicators;
@@ -133,16 +129,7 @@ calorias!
             </CardItem>
             <CardItem bordered>
               <Body>
-                <PieChartComponent
-                  isPorcentage
-                  data={[
-                    { name: 'Café da manhã', value: 50 },
-                    { name: 'Lanche da manhã', value: 100 },
-                    { name: 'Almoço', value: 230 },
-                    { name: 'Café da tarde', value: 280 },
-                    { name: 'Jantar', value: 210 },
-                  ]}
-                />
+                <PieChartComponent isPorcentage data={meals_data || []} />
               </Body>
             </CardItem>
           </Card>
