@@ -1,6 +1,7 @@
 import { getRequest } from '../../utils/request';
 import { getRealm } from '../../config/realm';
 import { verifyShowError } from '../../utils/errors';
+import { setList } from '../../actions/mealType';
 
 /**
  * realiza o mapeamento no formato necessário para a base de dados
@@ -44,8 +45,7 @@ export const list = async () => {
  */
 export const verifyExists = async (realm) => {
   const result = await realm.objects('MealType').sorted('id');
-
-  return result.length > 0;
+  return result;
 };
 
 export const bulkInsert = async (realm, data) => {
@@ -66,13 +66,14 @@ export const bulkInsert = async (realm, data) => {
 export const loadMealTypeFlow = async () => {
   const realm = await getRealm();
   const hasMeals = await verifyExists(realm);
+  let data = [...hasMeals];
 
   // verificar, também, se usuário está online
-  if (!hasMeals) {
-    const data = await list();
+  if (hasMeals.length === 0) {
+    data = await list();
     const inserted = await bulkInsert(realm, data);
     return inserted;
   }
 
-  return true;
+  return data;
 };

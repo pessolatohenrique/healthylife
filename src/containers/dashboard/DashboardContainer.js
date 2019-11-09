@@ -5,7 +5,10 @@ import {
   Container, Content, Card, CardItem, Text, Body,
 } from 'native-base';
 import * as Progress from 'react-native-progress';
+import PropTypes from 'prop-types';
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { connect } from 'react-redux';
 import PieChartComponent from '../../components/PieChartComponent';
 import commonStyle from '../../utils/commonStyle';
 
@@ -14,6 +17,7 @@ import { getUserCalculate, insert, getLastResult } from './functions';
 import { loadMealTypeFlow } from '../mealType/functions';
 import { verifyShowError } from '../../utils/errors';
 import { getRealm } from '../../config/realm';
+import { setList as setMealTypes } from '../../actions/mealType';
 
 class DashboardContainer extends Component {
   constructor(props) {
@@ -49,13 +53,15 @@ class DashboardContainer extends Component {
     por exemplo: tipos de refeição
   */
   loadComplementars = async () => {
-    await loadMealTypeFlow();
+    const { onSetMeals } = this.props;
+    const meals = await loadMealTypeFlow();
+
+    onSetMeals(meals);
   };
 
   componentDidMount = async () => {
     await this.loadIndicators();
     await this.loadComplementars();
-    // this.loadCharts();
   };
 
   render() {
@@ -150,8 +156,18 @@ calorias!
 }
 
 DashboardContainer.propTypes = {
-  // product: PropTypes.object.isRequired,
-  // createProduct: PropTypes.func.isRequired,
+  onSetMeals: PropTypes.func.isRequired,
 };
 
-export default DashboardContainer;
+const mapStateToProps = state => ({
+  mealTypeList: state.mealType.list,
+});
+
+const mapDispatchToProps = dispatch => ({
+  onSetMeals: data => dispatch(setMealTypes(data)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(DashboardContainer);
