@@ -31,6 +31,7 @@ import {
 import { verifyShowError } from '../../utils/errors';
 import { getRealm } from '../../config/realm';
 import { setList as setMealTypes } from '../../actions/mealType';
+import NotFound from '../../components/NotFound';
 
 class DashboardContainer extends Component {
   constructor(props) {
@@ -96,8 +97,6 @@ class DashboardContainer extends Component {
 
     const historyData = await searchWeightHistory(realm);
 
-    console.tron.log("history", historyData);
-
     this.setState({ weight_history_data: mapWeightHistory(historyData) });
   };
 
@@ -154,7 +153,11 @@ calorias!
             </CardItem>
             <CardItem bordered>
               <Body>
-                <PieChartComponent isPorcentage data={meals_data || []} />
+                {meals_data && meals_data.length > 0 ? (
+                  <PieChartComponent isPorcentage data={meals_data || []} />
+                ) : (
+                  <NotFound />
+                )}
               </Body>
             </CardItem>
           </Card>
@@ -165,7 +168,11 @@ calorias!
             </CardItem>
             <CardItem bordered>
               <Body>
-                <LineChartComponent data={weight_history_data} />
+                {weight_history_data && weight_history_data.length > 0 ? (
+                  <LineChartComponent data={weight_history_data} />
+                ) : (
+                  <NotFound />
+                )}
               </Body>
             </CardItem>
             <CardItem footer bordered>

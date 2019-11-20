@@ -13,22 +13,32 @@ class PieChartComponent extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.mapChart();
+  }
+
   componentDidUpdate(prevProps) {
     const { data } = this.props;
-    if (data !== prevProps.data) {
-      const dataMaped = [...data].map((item, index) => {
-        const itemNew = {
-          ...item,
-          color: CHART_COLORS[index],
-          legendFontColor: LEGEND_PIE_COLOR,
-          legendFontSize: LEGEND_PIE_FONT_SIZE,
-        };
-        return itemNew;
-      });
 
-      this.setState({ dataMaped });
+    if (data !== prevProps.data) {
+      this.mapChart();
     }
   }
+
+  mapChart = () => {
+    const { data } = this.props;
+    const dataMaped = [...data].map((item, index) => {
+      const itemNew = {
+        ...item,
+        color: CHART_COLORS[index],
+        legendFontColor: LEGEND_PIE_COLOR,
+        legendFontSize: LEGEND_PIE_FONT_SIZE,
+      };
+      return itemNew;
+    });
+
+    this.setState({ dataMaped });
+  };
 
   render() {
     const { isPorcentage } = this.props;

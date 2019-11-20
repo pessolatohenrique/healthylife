@@ -15,24 +15,33 @@ class LineChartComponent extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.mapChart();
+  }
+
   componentDidUpdate(prevProps) {
     const { data } = this.props;
     if (data !== prevProps.data && data) {
-      const labels = [...data].map(item => item.name);
-      const values = [...data].map(item => item.value);
-
-      const dataMaped = {
-        labels,
-        datasets: [
-          {
-            data: values,
-          },
-        ],
-      };
-
-      this.setState({ dataMaped });
+      this.mapChart();
     }
   }
+
+  mapChart = () => {
+    const { data } = this.props;
+    const labels = [...data].map(item => item.name);
+    const values = [...data].map(item => item.value);
+
+    const dataMaped = {
+      labels,
+      datasets: [
+        {
+          data: values,
+        },
+      ],
+    };
+
+    this.setState({ dataMaped });
+  };
 
   render() {
     const { dataMaped } = this.state;
