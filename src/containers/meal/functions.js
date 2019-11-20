@@ -9,8 +9,6 @@ import { verifyShowError } from '../../utils/errors';
  * @param {Array} mealTypes tipos de refeição
  * @return {Array} finalDataMaped dados mapeados
  */
-
-// meal_type_id (associativo), consumed_at, calories_total, created_at, updated_at
 export const mapList = (data, mealTypes) => {
   let finalDataMaped = [];
 
@@ -90,6 +88,19 @@ export const verifyExists = async (realm, currentItem) => {
     .sorted('id');
 
   return result;
+};
+
+export const searchFromToday = async (realm) => {
+  const data = realm
+    .objects('Meal')
+    .filtered(
+      'created_at >= $0 AND created_at <= $1',
+      `${Moment().format('YYYY-MM-DD')}T00:00:00`,
+      `${Moment().format('YYYY-MM-DD')}T23:59:00`,
+    )
+    .sorted('id');
+
+  return data;
 };
 
 export const bulkInsert = async (realm, data) => {

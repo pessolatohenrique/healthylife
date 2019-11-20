@@ -19,6 +19,7 @@ import {
   getCalculateCalories,
   bulkInsert as insertMealReport,
   mapToChart as mapChartMeal,
+  searchFromToday as searchMeals,
 } from '../meal/functions';
 
 import { verifyShowError } from '../../utils/errors';
@@ -73,7 +74,7 @@ class DashboardContainer extends Component {
 
     await insertMealReport(realm, data);
 
-    const mealsData = realm.objects('Meal').sorted('id');
+    const mealsData = await searchMeals(realm);
     this.setState({ meals_data: mapChartMeal(mealsData) });
   };
 
@@ -142,11 +143,11 @@ calorias!
               <Body>
                 <LineChartComponent
                   data={[
-                    { name: '01/10', value: 50 },
-                    { name: '08/10', value: 100 },
-                    { name: '15/10', value: 230 },
-                    { name: '22/10', value: 280 },
-                    { name: '29/10', value: 210 },
+                    { name: '01/10', value: 64 },
+                    { name: '08/10', value: 67 },
+                    { name: '15/10', value: 65 },
+                    { name: '22/10', value: 65 },
+                    { name: '29/10', value: 64 },
                   ]}
                 />
               </Body>
