@@ -21,6 +21,12 @@ import {
   mapToChart as mapChartMeal,
   searchFromToday as searchMeals,
 } from '../meal/functions';
+import {
+  getHistory as getWeightHistory,
+  bulkInsert as insertWeightHistory,
+  searchFromMonth as searchWeightHistory,
+  mapToChart as mapWeightHistory,
+} from '../historyWeight/functions';
 
 import { verifyShowError } from '../../utils/errors';
 import { getRealm } from '../../config/realm';
@@ -36,6 +42,7 @@ class DashboardContainer extends Component {
         consumed: 0,
         imc_classification: '#N/D',
         meals_data: [],
+        weight_history_data: [],
       },
     };
   }
@@ -61,6 +68,7 @@ class DashboardContainer extends Component {
     por exemplo: tipos de refeição
   */
   loadComplementars = async () => {
+    // verificar se está online
     const { onSetMeals } = this.props;
     const meals = await loadMealTypeFlow();
 
@@ -68,6 +76,7 @@ class DashboardContainer extends Component {
   };
 
   loadMealReport = async () => {
+    // verificar se está online
     const { mealTypeList } = this.props;
     const data = await getCalculateCalories(mealTypeList);
     const realm = await getRealm();
@@ -78,14 +87,29 @@ class DashboardContainer extends Component {
     this.setState({ meals_data: mapChartMeal(mealsData) });
   };
 
+  loadWeightReport = async () => {
+    // verificar se está online
+    const realm = await getRealm();
+    const data = await getWeightHistory();
+
+    await insertWeightHistory(realm, data);
+
+    const historyData = await searchWeightHistory(realm);
+
+    console.tron.log("history", historyData);
+
+    this.setState({ weight_history_data: mapWeightHistory(historyData) });
+  };
+
   componentDidMount = async () => {
     await this.loadIndicators();
     await this.loadComplementars();
     await this.loadMealReport();
+    await this.loadWeightReport();
   };
 
   render() {
-    const { indicators, meals_data } = this.state;
+    const { indicators, meals_data, weight_history_data } = this.state;
     const {
       consumed_percentage, diet_value, consumed, imc_classification,
     } = indicators;
@@ -141,15 +165,7 @@ calorias!
             </CardItem>
             <CardItem bordered>
               <Body>
-                <LineChartComponent
-                  data={[
-                    { name: '01/10', value: 64 },
-                    { name: '08/10', value: 67 },
-                    { name: '15/10', value: 65 },
-                    { name: '22/10', value: 65 },
-                    { name: '29/10', value: 64 },
-                  ]}
-                />
+                <LineChartComponent data={weight_history_data} />
               </Body>
             </CardItem>
             <CardItem footer bordered>

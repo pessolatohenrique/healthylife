@@ -40,8 +40,23 @@ const MealSchema = {
   },
 };
 
+const WeightHistorySchema = {
+  name: 'WeightHistory',
+  primaryKey: 'id',
+  properties: {
+    id: { type: 'int', indexed: true },
+    registered_at: 'date',
+    weight: 'double',
+    difference_weight: 'double',
+    difference_imc: 'double',
+    classification_imc: 'string',
+    created_at: 'date',
+    updated_at: 'date',
+  },
+};
+
 const getRealm = () => Realm.open({
-  schema: [IndicativeSchema, MealTypeSchema, MealSchema],
+  schema: [IndicativeSchema, MealTypeSchema, MealSchema, WeightHistorySchema],
 }).catch(error => console.tron.error('Error realm open', error));
 
 export { IndicativeSchema, getRealm };

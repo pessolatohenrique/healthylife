@@ -1,3 +1,4 @@
+/* eslint-disable react/no-did-update-set-state */
 import React from 'react';
 import { Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
@@ -14,21 +15,23 @@ class LineChartComponent extends React.Component {
     };
   }
 
-  componentDidMount() {
+  componentDidUpdate(prevProps) {
     const { data } = this.props;
-    const labels = [...data].map(item => item.name);
-    const values = [...data].map(item => item.value);
+    if (data !== prevProps.data && data) {
+      const labels = [...data].map(item => item.name);
+      const values = [...data].map(item => item.value);
 
-    const dataMaped = {
-      labels,
-      datasets: [
-        {
-          data: values,
-        },
-      ],
-    };
+      const dataMaped = {
+        labels,
+        datasets: [
+          {
+            data: values,
+          },
+        ],
+      };
 
-    this.setState({ dataMaped });
+      this.setState({ dataMaped });
+    }
   }
 
   render() {
@@ -58,8 +61,12 @@ class LineChartComponent extends React.Component {
   }
 }
 
+LineChartComponent.defaultProps = {
+  data: [],
+};
+
 LineChartComponent.propTypes = {
-  data: PropTypes.array.isRequired,
+  data: PropTypes.array,
 };
 
 export default LineChartComponent;
