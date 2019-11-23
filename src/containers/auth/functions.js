@@ -17,7 +17,7 @@ export const login = async (username, password) => {
   if (request && request.data) {
     const { access_token } = request.data;
 
-    axios.defaults.headers.common.Authorization = access_token;
+    axios.defaults.headers.common.Authorization = `Bearer ${access_token}`;
     finalData = access_token;
   }
 
