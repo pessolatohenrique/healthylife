@@ -2,7 +2,7 @@
 /* eslint-disable camelcase */
 import React, { Component } from 'react';
 import {
-  Container, Content, Card, CardItem, Text, Body,
+ Container, Content, Card, CardItem, Text, Body 
 } from 'native-base';
 import * as Progress from 'react-native-progress';
 import PropTypes from 'prop-types';
@@ -32,6 +32,7 @@ import { verifyShowError } from '../../utils/errors';
 import { getRealm } from '../../config/realm';
 import { setList as setMealTypes } from '../../actions/mealType';
 import NotFound from '../../components/NotFound';
+import OfflineNotice from '../../components/OfflineNotice';
 
 class DashboardContainer extends Component {
   constructor(props) {
@@ -110,12 +111,17 @@ class DashboardContainer extends Component {
   render() {
     const { indicators, meals_data, weight_history_data } = this.state;
     const {
-      consumed_percentage, diet_value, consumed, imc_classification,
+      consumed_percentage,
+      diet_value,
+      consumed,
+      imc_classification,
     } = indicators;
 
     return (
       <Container>
         <Content padder>
+          <OfflineNotice />
+
           <Card>
             <CardItem header bordered>
               <Text style={commonStyle.colorTheme}>Consumo diário</Text>
@@ -134,16 +140,16 @@ class DashboardContainer extends Component {
             </CardItem>
             <CardItem footer bordered>
               <Text style={commonStyle.colorTheme}>
-                Você consumiu
-                {' '}
-                {consumed}
-                {' '}
+                Você consumiu 
+{' '}
+{consumed}
+{' '}
 de
-                {' '}
-                {diet_value}
-                {' '}
+{' '}
+{diet_value}
+{' '}
 calorias!
-              </Text>
+</Text>
             </CardItem>
           </Card>
 
@@ -177,9 +183,9 @@ calorias!
             </CardItem>
             <CardItem footer bordered>
               <Text style={commonStyle.colorTheme}>
-                Índice de massa corporal:
-                {' '}
-                {imc_classification}
+                Índice de massa corporal: 
+{' '}
+{imc_classification}
               </Text>
             </CardItem>
           </Card>
@@ -202,7 +208,4 @@ const mapDispatchToProps = dispatch => ({
   onSetMeals: data => dispatch(setMealTypes(data)),
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(DashboardContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(DashboardContainer);
