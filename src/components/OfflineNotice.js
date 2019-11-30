@@ -1,6 +1,10 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import React, { Component } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { setStatus } from '../actions/connection';
 
 import commonStyle from '../utils/commonStyle';
 
@@ -18,9 +22,7 @@ const styles = StyleSheet.create({
 class OfflineNotice extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      isConnected: false,
-    };
+    this.state = {};
   }
 
   componentDidMount() {
@@ -38,15 +40,14 @@ class OfflineNotice extends Component {
   }
 
   handleConnectivityChange = (isConnected) => {
-    this.setState({ isConnected });
+    const { onSetStatus } = this.props;
+    onSetStatus(isConnected);
   };
 
   render() {
-    const { isConnected } = this.state;
+    const { connection } = this.props;
 
-    // console.tron.log('is connected', isConnected);
-
-    if (!isConnected) {
+    if (!connection.status) {
       return (
         <View style={[commonStyle.containerRowCenter, styles.noticeContainer]}>
           <Text style={styles.noticeText}>
@@ -60,4 +61,17 @@ class OfflineNotice extends Component {
   }
 }
 
-export default OfflineNotice;
+OfflineNotice.propTypes = {
+  onSetStatus: PropTypes.func.isRequired,
+  connection: PropTypes.object.isRequired,
+};
+
+const mapStateToProps = state => ({
+  connection: state.connection,
+});
+
+const mapDispatchToProps = dispatch => ({
+  onSetStatus: status => dispatch(setStatus(status)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(OfflineNotice);
