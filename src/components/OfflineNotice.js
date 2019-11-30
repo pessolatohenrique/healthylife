@@ -39,9 +39,9 @@ class OfflineNotice extends Component {
     );
   }
 
-  handleConnectivityChange = (isConnected) => {
+  handleConnectivityChange = async (isConnected) => {
     const { onSetStatus } = this.props;
-    onSetStatus(isConnected);
+    await onSetStatus(isConnected);
   };
 
   render() {

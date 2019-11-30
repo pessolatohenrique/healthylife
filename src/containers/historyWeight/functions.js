@@ -15,7 +15,9 @@ export const mapList = (data) => {
     finalDataMaped = [...data].map((item) => {
       const itemCopy = {
         id: item.id,
-        registered_at: new Date(Moment(item.data_lancamento, 'DD/MM/YYYY').format('YYYY-MM-DD')),
+        registered_at: new Date(
+          Moment(item.data_lancamento, 'DD/MM/YYYY').format('YYYY-MM-DD'),
+        ),
         weight: formatDecimalToNumber(item.peso),
         difference_imc: formatDecimalToNumber(item.diferenca_imc),
         difference_weight: formatDecimalToNumber(item.diferenca_peso),
@@ -32,14 +34,18 @@ export const mapList = (data) => {
 };
 
 export const mapToChart = (data) => {
-  const lastResults = [...data].slice(Math.max([...data].length - 5));
+  let lastResults = [...data];
+
+  if (lastResults.length >= 10) {
+    lastResults = [...data].slice(Math.max([...data].length - 5));
+  }
 
   return [...lastResults].map(item => Object.assign({
-    name: Moment(item.registered_at)
-      .format('DD/MM')
-      .toString(),
-    value: item.weight,
-  }));
+      name: Moment(item.registered_at)
+        .format('DD/MM')
+        .toString(),
+      value: item.weight,
+    }),);
 };
 
 /**
@@ -80,7 +86,11 @@ export const searchFromMonth = async (realm) => {
 
   const result = await realm
     .objects('WeightHistory')
-    .filtered('registered_at >= $0 AND registered_at <= $1', dateLastMonth, currentDate)
+    .filtered(
+      'registered_at >= $0 AND registered_at <= $1',
+      dateLastMonth,
+      currentDate,
+    )
     .sorted('id');
 
   return result;

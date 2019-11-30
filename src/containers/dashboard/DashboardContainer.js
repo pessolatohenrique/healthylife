@@ -1,14 +1,22 @@
 /* eslint-disable no-unused-vars */
-/* eslint-disable camelcase */
 import React, { Component } from 'react';
 import {
- Container, Content, Card, CardItem, Text, Body 
+  Container,
+  Content,
+  Card,
+  CardItem,
+  Text,
+  Body,
+  Button,
 } from 'native-base';
+import { View } from 'react-native';
 import * as Progress from 'react-native-progress';
 import PropTypes from 'prop-types';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { connect } from 'react-redux';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+
 import PieChartComponent from '../../components/PieChartComponent';
 import commonStyle from '../../utils/commonStyle';
 
@@ -45,23 +53,30 @@ class DashboardContainer extends Component {
         imc_classification: '#N/D',
         meals_data: [],
         weight_history_data: [],
+        message: '#N/D',
       },
     };
   }
 
   loadIndicators = async () => {
-    // verificar se está online
-    const data = await getUserCalculate();
+    const { connection } = this.props;
     const realm = await getRealm();
 
-    if (verifyShowError(data)) return;
+    if (connection.status) {
+      const data = await getUserCalculate();
 
-    const inserted = await insert(realm, data);
+      if (verifyShowError(data)) return;
 
-    if (verifyShowError(inserted)) return;
+      const inserted = await insert(realm, data);
+
+      if (verifyShowError(inserted)) return;
+    }
+
+    const indicators = getLastResult(realm);
+    indicators.message = `Você consumiu ${indicators.consumed} de ${indicators.diet_value} calorias`;
 
     this.setState({
-      indicators: getLastResult(realm),
+      indicators,
     });
   };
 
@@ -70,57 +85,77 @@ class DashboardContainer extends Component {
     por exemplo: tipos de refeição
   */
   loadComplementars = async () => {
-    // verificar se está online
-    const { onSetMeals } = this.props;
-    const meals = await loadMealTypeFlow();
+    const { onSetMeals, connection } = this.props;
+    const meals = await loadMealTypeFlow(connection);
 
     onSetMeals(meals);
   };
 
   loadMealReport = async () => {
-    // verificar se está online
-    const { mealTypeList } = this.props;
-    const data = await getCalculateCalories(mealTypeList);
+    const { connection } = this.props;
     const realm = await getRealm();
 
-    await insertMealReport(realm, data);
+    if (connection.status) {
+      const { mealTypeList } = this.props;
+      const data = await getCalculateCalories(mealTypeList);
+
+      await insertMealReport(realm, data);
+    }
 
     const mealsData = await searchMeals(realm);
     this.setState({ meals_data: mapChartMeal(mealsData) });
   };
 
   loadWeightReport = async () => {
-    // verificar se está online
+    const { connection } = this.props;
     const realm = await getRealm();
-    const data = await getWeightHistory();
 
-    await insertWeightHistory(realm, data);
+    if (connection.status) {
+      const data = await getWeightHistory();
+      await insertWeightHistory(realm, data);
+    }
 
     const historyData = await searchWeightHistory(realm);
 
     this.setState({ weight_history_data: mapWeightHistory(historyData) });
   };
 
-  componentDidMount = async () => {
-    await this.loadIndicators();
+  loadFlow = async () => {
     await this.loadComplementars();
+    await this.loadIndicators();
     await this.loadMealReport();
     await this.loadWeightReport();
   };
 
+  componentDidMount = () => {
+    const { connection } = this.props;
+    if (!connection.status) {
+      this.loadFlow();
+    }
+  };
+
+  componentDidUpdate = (prevProps) => {
+    const { connection } = this.props;
+    if (prevProps.connection.status !== connection.status) {
+      this.loadFlow();
+    }
+  };
+
   render() {
     const { indicators, meals_data, weight_history_data } = this.state;
-    const {
-      consumed_percentage,
-      diet_value,
-      consumed,
-      imc_classification,
-    } = indicators;
+    const { consumed_percentage, imc_classification, message } = indicators;
 
     return (
       <Container>
         <Content padder>
           <OfflineNotice />
+
+          <View style={commonStyle.containerRowCenter}>
+            <Button transparent iconLeft onPress={() => this.loadFlow()}>
+              <Icon name="sync-alt" />
+              <Text>Atualizar</Text>
+            </Button>
+          </View>
 
           <Card>
             <CardItem header bordered>
@@ -139,17 +174,7 @@ class DashboardContainer extends Component {
               </Body>
             </CardItem>
             <CardItem footer bordered>
-              <Text style={commonStyle.colorTheme}>
-                Você consumiu 
-{' '}
-{consumed}
-{' '}
-de
-{' '}
-{diet_value}
-{' '}
-calorias!
-</Text>
+              <Text style={commonStyle.colorTheme}>{message}</Text>
             </CardItem>
           </Card>
 
@@ -183,9 +208,9 @@ calorias!
             </CardItem>
             <CardItem footer bordered>
               <Text style={commonStyle.colorTheme}>
-                Índice de massa corporal: 
-{' '}
-{imc_classification}
+                Índice de massa corporal:
+                <Text> </Text>
+                <Text style={commonStyle.colorTheme}>{imc_classification}</Text>
               </Text>
             </CardItem>
           </Card>
@@ -198,10 +223,12 @@ calorias!
 DashboardContainer.propTypes = {
   onSetMeals: PropTypes.func.isRequired,
   mealTypeList: PropTypes.array.isRequired,
+  connection: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = state => ({
   mealTypeList: state.mealType.list,
+  connection: state.connection,
 });
 
 const mapDispatchToProps = dispatch => ({
