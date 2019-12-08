@@ -51,4 +51,10 @@ export default StyleSheet.create({
   },
   regularInput: { backgroundColor: '#ffffff', marginBottom: 10 },
   containerMargin: { marginLeft: 10, marginRight: 10 },
+  imageSection: {
+    height: 200,
+    width: null,
+    flex: 1,
+    resizeMode: 'contain',
+  },
 });

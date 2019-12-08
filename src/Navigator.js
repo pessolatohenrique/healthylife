@@ -16,6 +16,7 @@ import ListExample from './containers/exampleRealm/ListExample';
 import CustomHeaderSearch from './components/CustomHeaderSearch';
 import AuthLoading from './containers/auth/AuthLoading';
 import SignIn from './containers/auth/SignIn';
+import ReportContainer from './containers/report/ReportContainer';
 
 /**
  * cada página pode ter subpáginas.
@@ -76,12 +77,11 @@ const RegisterStack = createStackNavigator({
   // Details: DetailsScreen,
 });
 
-const ListStack = createStackNavigator({
+const ReportStack = createStackNavigator({
   Home: {
-    screen: ({ navigation }) => <ListExample navigation={navigation} />,
+    screen: ({ navigation }) => <ReportContainer navigation={navigation} />,
     navigationOptions: ({ navigation }) => ({
-      title: 'List',
-      headerTitle: <CustomHeaderSearch title="List" navigation={navigation} />,
+      title: 'Relatórios',
       headerTintColor: '#fff',
       headerStyle: commonStyle.header,
     }),
@@ -108,24 +108,30 @@ const MenuRoutes = {
     navigationOptions: {
       title: 'Dashboard',
       header: { visible: true },
-      tabBarIcon: ({ tintColor }) => <Icon name="home" size={30} color={tintColor} />,
+      tabBarIcon: ({ tintColor }) => (
+        <Icon name="home" size={30} color={tintColor} />
+      ),
     },
   },
   Add: {
-    name: 'Tab2',
+    name: 'Meals',
     screen: RegisterStack,
     navigationOptions: {
-      title: 'Register',
-      tabBarIcon: ({ tintColor }) => <Icon name="user" size={30} color={tintColor} />,
+      title: 'Refeições',
+      tabBarIcon: ({ tintColor }) => (
+        <Icon name="utensils" size={30} color={tintColor} />
+      ),
     },
   },
   List: {
-    name: 'Tab3',
-    screen: ListStack,
+    name: 'Reports',
+    screen: ReportStack,
     navigationOptions: {
-      title: 'List',
+      title: 'Relatórios',
       // headerTitle: <CustomHeaderSearch />,
-      tabBarIcon: ({ tintColor }) => <Icon name="list" size={30} color={tintColor} />,
+      tabBarIcon: ({ tintColor }) => (
+        <Icon name="chart-line" size={30} color={tintColor} />
+      ),
     },
   },
 };
