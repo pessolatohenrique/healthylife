@@ -72,4 +72,6 @@ export default StyleSheet.create({
     borderRadius: 4,
     borderColor: 'rgba(0, 0, 0, 0.1)',
   },
+  fieldWidth: { width: '49%' },
+  fieldMargin: { marginRight: 10 },
 });
