@@ -63,4 +63,13 @@ export default StyleSheet.create({
   fabSub: {
     backgroundColor: '#EAF5F6',
   },
+  modalBottom: { justifyContent: 'flex-end', margin: 0 },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 4,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+  },
 });

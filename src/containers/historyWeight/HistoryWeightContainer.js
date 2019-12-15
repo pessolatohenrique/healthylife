@@ -8,27 +8,29 @@ import {
   Left,
   Body,
   Picker,
-  Fab,
-  Icon,
-  View,
-  Button,
 } from 'native-base';
 import LineChartComponent from '../../components/LineChartComponent';
 import commonStyle from '../../utils/commonStyle';
 import WeightList from './WeightList';
 import ImcList from './ImcList';
 import FabOptions from './FabOptions';
+import SearchModal from './SearchModal';
 
 class HistoryWeightContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
       selected: 'chart',
+      visibleModal: false,
     };
   }
 
+  toggleModal = (status) => {
+    this.setState({ visibleModal: status });
+  };
+
   render() {
-    const { selected } = this.state;
+    const { selected, visibleModal } = this.state;
 
     return (
       <Container>
@@ -81,7 +83,11 @@ class HistoryWeightContainer extends Component {
             )}
           </Card>
         </Content>
-        <FabOptions />
+        <SearchModal
+          visible={visibleModal}
+          onClose={() => this.toggleModal(false)}
+        />
+        <FabOptions onSearch={this.toggleModal} />
       </Container>
     );
   }

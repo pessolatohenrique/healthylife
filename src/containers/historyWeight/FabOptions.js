@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Fab, View, Button } from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { MAIN_COLOR } from '../../constants/general';
+import PropTypes from 'prop-types';
 import commonStyle from '../../utils/commonStyle';
 
 class FabOptions extends Component {
@@ -19,6 +19,7 @@ class FabOptions extends Component {
 
   render() {
     const { active } = this.state;
+    const { onSearch } = this.props;
     return (
       <View>
         <Fab
@@ -31,7 +32,7 @@ class FabOptions extends Component {
         >
           <Icon name="bars" />
 
-          <Button style={commonStyle.fabSub}>
+          <Button style={commonStyle.fabSub} onPress={() => onSearch(true)}>
             <Icon name="search" size={15} />
           </Button>
           <Button style={commonStyle.fabSub}>
@@ -42,5 +43,9 @@ class FabOptions extends Component {
     );
   }
 }
+
+FabOptions.propTypes = {
+  onSearch: PropTypes.func.isRequired,
+};
 
 export default FabOptions;
