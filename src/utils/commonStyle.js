@@ -57,4 +57,10 @@ export default StyleSheet.create({
     flex: 1,
     resizeMode: 'contain',
   },
+  fabMain: {
+    backgroundColor: MAIN_COLOR,
+  },
+  fabSub: {
+    backgroundColor: '#EAF5F6',
+  },
 });

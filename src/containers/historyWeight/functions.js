@@ -44,6 +44,7 @@ export const mapToChart = (data) => {
       name: Moment(item.registered_at)
         .format('DD/MM')
         .toString(),
+
       value: item.weight,
     }),);
 };
