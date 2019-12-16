@@ -9,12 +9,23 @@ import {
   Body,
   Picker,
 } from 'native-base';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import LineChartComponent from '../../components/LineChartComponent';
+import OfflineNotice from '../../components/OfflineNotice';
+import NotFound from '../../components/NotFound';
+import { getRealm } from '../../config/realm';
 import commonStyle from '../../utils/commonStyle';
 import WeightList from './WeightList';
 import ImcList from './ImcList';
 import FabOptions from './FabOptions';
 import SearchModal from './SearchModal';
+import {
+  getHistory as getWeightHistory,
+  bulkInsert as insertWeightHistory,
+  searchFromMonth,
+  mapToChart as mapWeightHistory,
+} from './functions';
 
 class HistoryWeightContainer extends Component {
   constructor(props) {
@@ -22,8 +33,28 @@ class HistoryWeightContainer extends Component {
     this.state = {
       selected: 'chart',
       visibleModal: false,
+      chartData: [],
+      historyData: [],
     };
   }
+
+  loadInitialReport = async () => {
+    const { connection } = this.props;
+    const realm = await getRealm();
+
+    if (connection.status) {
+      const data = await getWeightHistory();
+      await insertWeightHistory(realm, data);
+    }
+
+    const historyData = await searchFromMonth(realm);
+
+    this.setState({ historyData, chartData: mapWeightHistory(historyData) });
+  };
+
+  componentDidMount = () => {
+    this.loadInitialReport();
+  };
 
   toggleModal = (status) => {
     this.setState({ visibleModal: status });
@@ -31,10 +62,12 @@ class HistoryWeightContainer extends Component {
 
   render() {
     const { selected, visibleModal } = this.state;
+    const { historyData, chartData } = this.state;
 
     return (
       <Container>
         <Content padder>
+          <OfflineNotice />
           <Card>
             <CardItem>
               <Left>
@@ -61,24 +94,24 @@ class HistoryWeightContainer extends Component {
             </CardItem>
             {selected === 'chart' && (
               <CardItem>
-                <LineChartComponent
-                  data={[
-                    { name: '26/05', value: 190 },
-                    { name: '26/06', value: 220 },
-                  ]}
-                />
+                {chartData && chartData.length > 0 ? (
+                  <LineChartComponent data={chartData} />
+                ) : (
+                  <NotFound />
+                )}
               </CardItem>
             )}
 
+            {/** passar o history data aqui. Depois converter para FlatList */}
             {selected === 'weight' && (
               <CardItem>
-                <WeightList />
+                <WeightList data={historyData} />
               </CardItem>
             )}
 
             {selected === 'imc' && (
               <CardItem>
-                <ImcList />
+                <ImcList data={historyData} />
               </CardItem>
             )}
           </Card>
@@ -93,4 +126,12 @@ class HistoryWeightContainer extends Component {
   }
 }
 
-export default HistoryWeightContainer;
+HistoryWeightContainer.propTypes = {
+  connection: PropTypes.object.isRequired,
+};
+
+const mapStateToProps = state => ({
+  connection: state.connection,
+});
+
+export default connect(mapStateToProps, null)(HistoryWeightContainer);

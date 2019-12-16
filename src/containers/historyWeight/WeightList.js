@@ -1,4 +1,5 @@
 import React from 'react';
+import { FlatList } from 'react-native';
 import {
   Container,
   Content,
@@ -7,55 +8,57 @@ import {
   Text,
   Body,
   Right,
-  Left,
   Badge,
 } from 'native-base';
+import PropTypes from 'prop-types';
+import moment from 'moment';
 
-const WeightList = props => (
-  <Container>
-    <Content>
-      <List>
-        <ListItem avatar>
-          <Body>
-            <Text>10/12/2019</Text>
-            <Text note>63 KG</Text>
-          </Body>
-          <Right>
-            <Badge success>
-              <Text>0,50</Text>
-            </Badge>
-            {/* <Text note>3:43 pm</Text> */}
-          </Right>
-        </ListItem>
-        <ListItem avatar>
-          <Left>{/* <Thumbnail source={{ uri: 'Image URL' }} /> */}</Left>
-          <Body>
-            <Text>10/12/2019</Text>
-            <Text note>63 KG</Text>
-          </Body>
-          <Right>
-            <Badge success>
-              <Text>0,50</Text>
-            </Badge>
-            {/* <Text note>3:43 pm</Text> */}
-          </Right>
-        </ListItem>
-        <ListItem avatar>
-          <Left>{/* <Thumbnail source={{ uri: 'Image URL' }} /> */}</Left>
-          <Body>
-            <Text>10/12/2019</Text>
-            <Text note>63 KG</Text>
-          </Body>
-          <Right>
-            <Badge danger>
-              <Text>0,30</Text>
-            </Badge>
-            {/* <Text note>3:43 pm</Text> */}
-          </Right>
-        </ListItem>
-      </List>
-    </Content>
-  </Container>
+const WeightItem = ({ item }) => (
+  <ListItem avatar>
+    <Body>
+      <Text>{moment(item.registered_at).format('DD/MM/YYYY')}</Text>
+      <Text note>
+        <Text note>{item.weight}</Text>
+        <Text note>kg</Text>
+      </Text>
+    </Body>
+    <Right>
+      {item.difference_weight >= 0 ? (
+        <Badge success>
+          <Text>{item.difference_weight}</Text>
+        </Badge>
+      ) : (
+        <Badge danger>
+          <Text>{item.difference_weight}</Text>
+        </Badge>
+      )}
+    </Right>
+  </ListItem>
 );
+
+const WeightList = (props) => {
+  const { data } = props;
+  return (
+    <Container>
+      <Content>
+        <List>
+          <FlatList
+            data={data}
+            renderItem={({ item }) => <WeightItem item={item} />}
+            keyExtractor={item => item.id.toString()}
+          />
+        </List>
+      </Content>
+    </Container>
+  );
+};
+
+WeightList.propTypes = {
+  data: PropTypes.object.isRequired,
+};
+
+WeightItem.propTypes = {
+  item: PropTypes.object.isRequired,
+};
 
 export default WeightList;

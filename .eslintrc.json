@@ -19,6 +19,7 @@
     "no-unused-expressions": ["error", { "allowTaggedTemplates": true }],
     "linebreak-style": 0,
     "react/prefer-stateless-function": "off",
-    "camelcase": "off"
+    "camelcase": "off",
+    "import/no-extraneous-dependencies": "off"
   }
 }
