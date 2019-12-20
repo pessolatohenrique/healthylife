@@ -34,6 +34,11 @@ export const mapList = data => {
   return finalDataMaped;
 };
 
+/**
+ * realiza o mapeamento para exibir no gráfico de linha
+ * @param {Array} data dados a serem mapeados
+ * @return {Array} dataMaped dados mapeados
+ */
 export const mapToChart = data => {
   let lastResults = [...data];
 
@@ -98,6 +103,12 @@ export const verifyExists = async (currentItem, data) => {
   return result;
 };
 
+/**
+ * realiza a pesquisa na base de dados local,
+ * com dados do último mês
+ * @param {Object} realm informações do realm database
+ * @return {Array} result dados da pesquisa
+ */
 export const searchFromMonth = async realm => {
   const currentDate = Moment().format("YYYY-MM-DD");
   const dateLastMonth = Moment()
@@ -116,6 +127,13 @@ export const searchFromMonth = async realm => {
   return result;
 };
 
+/**
+ * realiza a pesquisa na base de dados local,
+ * com dados parametrizados
+ * @param {Object} realm informações do realm database
+ * @param {Object} objectSearch informacoes da pesquisa
+ * @return {Array} result dados da pesquisa
+ */
 export const search = async (realm, objectSearch) => {
   const { date_initial, date_final } = objectSearch;
 
@@ -131,12 +149,23 @@ export const search = async (realm, objectSearch) => {
   return result;
 };
 
+/**
+ * realiza a pesquisa na base de dados local,
+ * com dados gerais
+ * @param {Object} realm informações do realm database
+ * @return {Array} result dados da pesquisa
+ */
 export const listAll = async realm => {
   const result = await realm.objects("WeightHistory").sorted("id");
 
   return result;
 };
 
+/**
+ * realiza inserção na base de dados local
+ * @param {Object} realm informações do realm database
+ * @return {Bool} inserted
+ */
 export const insert = (realm, data) => {
   try {
     realm.write(() => {
@@ -149,6 +178,12 @@ export const insert = (realm, data) => {
   return true;
 };
 
+/**
+ * realiza inserção na base de dados local
+ * @param {Object} realm informações do realm database
+ * @param {Array} data dados a serem inseridos
+ * @return {Array} finalData dados inseridos
+ */
 export const bulkInsert = async (realm, data) => {
   const finalData = Object.assign({}, realm);
   try {
@@ -169,6 +204,12 @@ export const bulkInsert = async (realm, data) => {
   return finalData;
 };
 
+/**
+ * realiza inserção na base de dados local
+ * @param {Object} realm informações do realm database
+ * @param {Array} data dados a serem inseridos
+ * @return {Array} finalData dados inseridos
+ */
 export const bulkInsertFromSearch = async (realm, data) => {
   const finalData = Object.assign({}, realm);
   try {
