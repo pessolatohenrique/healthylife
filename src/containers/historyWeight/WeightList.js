@@ -1,5 +1,5 @@
-import React from 'react';
-import { FlatList } from 'react-native';
+import React from "react";
+import { FlatList } from "react-native";
 import {
   Container,
   Content,
@@ -8,15 +8,15 @@ import {
   Text,
   Body,
   Right,
-  Badge,
-} from 'native-base';
-import PropTypes from 'prop-types';
-import moment from 'moment';
+  Badge
+} from "native-base";
+import PropTypes from "prop-types";
+import moment from "moment";
 
 const WeightItem = ({ item }) => (
   <ListItem avatar>
     <Body>
-      <Text>{moment(item.registered_at).format('DD/MM/YYYY')}</Text>
+      <Text>{moment(item.registered_at).format("DD/MM/YYYY")}</Text>
       <Text note>
         <Text note>{item.weight}</Text>
         <Text note>kg</Text>
@@ -29,14 +29,14 @@ const WeightItem = ({ item }) => (
         </Badge>
       ) : (
         <Badge danger>
-          <Text>{item.difference_weight}</Text>
+          <Text>{item.difference_weight.toString().replace("-", "")}</Text>
         </Badge>
       )}
     </Right>
   </ListItem>
 );
 
-const WeightList = (props) => {
+const WeightList = props => {
   const { data } = props;
   return (
     <Container>
@@ -54,11 +54,11 @@ const WeightList = (props) => {
 };
 
 WeightList.propTypes = {
-  data: PropTypes.object.isRequired,
+  data: PropTypes.object.isRequired
 };
 
 WeightItem.propTypes = {
-  item: PropTypes.object.isRequired,
+  item: PropTypes.object.isRequired
 };
 
 export default WeightList;

@@ -1,14 +1,14 @@
-import React, { Component } from 'react';
-import { Text, View, Button } from 'native-base';
-import Modal from 'react-native-modal';
-import DatePicker from 'react-native-datepicker';
-import PropTypes from 'prop-types';
-import { withFormik } from 'formik';
-import * as Yup from 'yup';
-import moment from 'moment';
-import commonStyle from '../../utils/commonStyle';
-import { getDifferenceInDays } from '../../utils/calendar';
-import styles from './styles';
+import React, { Component } from "react";
+import { Text, View, Button } from "native-base";
+import Modal from "react-native-modal";
+import DatePicker from "react-native-datepicker";
+import PropTypes from "prop-types";
+import { withFormik } from "formik";
+import * as Yup from "yup";
+import moment from "moment";
+import commonStyle from "../../utils/commonStyle";
+import { getDifferenceInDays } from "../../utils/calendar";
+import styles from "./styles";
 
 class SearchModal extends Component {
   render() {
@@ -19,14 +19,14 @@ class SearchModal extends Component {
       setFieldValue,
       handleSubmit,
       isSubmitting,
-      errors,
+      errors
     } = this.props;
     const { date_initial, date_final } = values;
     return (
       <View>
         <Modal
           isVisible={visible}
-          wipeDirection={['up', 'left', 'right', 'down']}
+          wipeDirection={["up", "left", "right", "down"]}
           style={commonStyle.modalBottom}
         >
           <View style={commonStyle.modalContent}>
@@ -49,7 +49,7 @@ class SearchModal extends Component {
                 confirmBtnText="Confirmar"
                 cancelBtnText="Cancelar"
                 showIcon={false}
-                onDateChange={date => setFieldValue('date_initial', date)}
+                onDateChange={date => setFieldValue("date_initial", date)}
               />
 
               <DatePicker
@@ -61,7 +61,7 @@ class SearchModal extends Component {
                 confirmBtnText="Confirmar"
                 cancelBtnText="Cancelar"
                 showIcon={false}
-                onDateChange={date => setFieldValue('date_final', date)}
+                onDateChange={date => setFieldValue("date_final", date)}
               />
             </View>
 
@@ -93,35 +93,36 @@ SearchModal.propTypes = {
   setFieldValue: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
-  errors: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
 };
 
 export default withFormik({
-  mapPropsToValues: () => ({ date_initial: '', date_final: '' }),
+  mapPropsToValues: () => ({ date_initial: "", date_final: "" }),
   validationSchema: Yup.object().shape({
-    date_initial: Yup.string().required('O campo data inicial é obrigatório'),
-    date_final: Yup.string().required('O campo data final é obrigatório'),
+    date_initial: Yup.string().required("O campo data inicial é obrigatório"),
+    date_final: Yup.string().required("O campo data final é obrigatório")
   }),
   handleSubmit: async (values, actions) => {
     const { date_initial, date_final } = values;
 
     const difference = getDifferenceInDays(
-      moment(date_initial, 'DD/MM/YYYY').format('YYYY-MM-DD'),
-      moment(date_final, 'DD/MM/YYYY').format('YYYY-MM-DD'),
+      moment(date_initial, "DD/MM/YYYY").format("YYYY-MM-DD"),
+      moment(date_final, "DD/MM/YYYY").format("YYYY-MM-DD")
     );
 
     if (difference < 0) {
       actions.setFieldError(
-        'date_initial',
-        'A data inicial deve ser menor que a final',
+        "date_initial",
+        "A data inicial deve ser menor que a final"
       );
       actions.setSubmitting(false);
       return false;
     }
 
+    actions.props.onSearch(date_initial, date_final);
     actions.props.onClose();
     actions.setSubmitting(false);
 
     return true;
-  },
+  }
 })(SearchModal);

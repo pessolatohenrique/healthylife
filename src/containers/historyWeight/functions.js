@@ -1,29 +1,30 @@
-import Moment from 'moment';
-import { getRequest } from '../../utils/request';
-import { formatDecimalToNumber } from '../../utils/formatters';
-import { verifyShowError } from '../../utils/errors';
+import Moment from "moment";
+import { getRequest } from "../../utils/request";
+import { formatDecimalToNumber } from "../../utils/formatters";
+import { verifyShowError } from "../../utils/errors";
+import moment from "moment";
 
 /**
  * realiza o mapeamento no formato necessário para a base de dados
  * @param {Array} data dados encontrados na API
  * @return {Array} finalDataMaped dados mapeados
  */
-export const mapList = (data) => {
+export const mapList = data => {
   let finalDataMaped = [];
 
   if (data && data.length > 0) {
-    finalDataMaped = [...data].map((item) => {
+    finalDataMaped = [...data].map(item => {
       const itemCopy = {
         id: item.id,
         registered_at: new Date(
-          Moment(item.data_lancamento, 'DD/MM/YYYY').format('YYYY-MM-DD'),
+          Moment(item.data_lancamento, "DD/MM/YYYY").format("YYYY-MM-DD")
         ),
         weight: formatDecimalToNumber(item.peso),
         difference_imc: formatDecimalToNumber(item.diferenca_imc),
         difference_weight: formatDecimalToNumber(item.diferenca_peso),
         classification_imc: item.classificacao_imc,
         created_at: new Date(),
-        updated_at: new Date(),
+        updated_at: new Date()
       };
 
       return itemCopy;
@@ -33,20 +34,22 @@ export const mapList = (data) => {
   return finalDataMaped;
 };
 
-export const mapToChart = (data) => {
+export const mapToChart = data => {
   let lastResults = [...data];
 
   if (lastResults.length >= 10) {
     lastResults = [...data].slice(Math.max([...data].length - 5));
   }
 
-  return [...lastResults].map(item => Object.assign({
+  return [...lastResults].map(item =>
+    Object.assign({
       name: Moment(item.registered_at)
-        .format('DD/MM')
+        .format("DD/MM")
         .toString(),
 
-      value: item.weight,
-    }),);
+      value: item.weight
+    })
+  );
 };
 
 /**
@@ -54,13 +57,29 @@ export const mapToChart = (data) => {
  * @return {Array} finalData pesos encontrados
  */
 export const getHistory = async () => {
-  const currentDate = Moment().format('DD/MM/YYYY');
+  const currentDate = Moment().format("DD/MM/YYYY");
   const dateLastMonth = Moment()
-    .subtract(30, 'days')
-    .format('DD/MM/YYYY');
+    .subtract(30, "days")
+    .format("DD/MM/YYYY");
 
   const finalData = await getRequest(
-    `weight-history?HistoricoPesoSearch[data_inicial]=${dateLastMonth}&HistoricoPesoSearch[data_final]=${currentDate}`,
+    `weight-history?HistoricoPesoSearch[data_inicial]=${dateLastMonth}&HistoricoPesoSearch[data_final]=${currentDate}`
+  );
+
+  const finalDataMaped = mapList(finalData);
+
+  return finalDataMaped;
+};
+
+/**
+ * realiza a pesquisa na API com base na data inicial e final
+ * @param {String} date_initial data inicial em formato "DD/MM/YYYY"
+ * @param {String} date_final data final em formato "DD/MM/YYYY"
+ * @return {Array} finalData lista com os dados
+ */
+export const getHistorySearch = async (date_initial, date_final) => {
+  const finalData = await getRequest(
+    `weight-history?HistoricoPesoSearch[data_inicial]=${date_initial}&HistoricoPesoSearch[data_final]=${date_final}`
   );
 
   const finalDataMaped = mapList(finalData);
@@ -79,20 +98,41 @@ export const verifyExists = async (currentItem, data) => {
   return result;
 };
 
-export const searchFromMonth = async (realm) => {
-  const currentDate = Moment().format('YYYY-MM-DD');
+export const searchFromMonth = async realm => {
+  const currentDate = Moment().format("YYYY-MM-DD");
   const dateLastMonth = Moment()
-    .subtract(30, 'days')
-    .format('YYYY-MM-DD');
+    .subtract(30, "days")
+    .format("YYYY-MM-DD");
 
   const result = await realm
-    .objects('WeightHistory')
+    .objects("WeightHistory")
     .filtered(
-      'registered_at >= $0 AND registered_at <= $1',
+      "registered_at >= $0 AND registered_at <= $1",
       dateLastMonth,
-      currentDate,
+      currentDate
     )
-    .sorted('id');
+    .sorted("id");
+
+  return result;
+};
+
+export const search = async (realm, objectSearch) => {
+  const { date_initial, date_final } = objectSearch;
+
+  const result = await realm
+    .objects("WeightHistory")
+    .filtered(
+      "registered_at >= $0 AND registered_at <= $1",
+      date_initial,
+      date_final
+    )
+    .sorted("registered_at");
+
+  return result;
+};
+
+export const listAll = async realm => {
+  const result = await realm.objects("WeightHistory").sorted("id");
 
   return result;
 };
@@ -100,10 +140,10 @@ export const searchFromMonth = async (realm) => {
 export const insert = (realm, data) => {
   try {
     realm.write(() => {
-      realm.create('WeightHistory', data);
+      realm.create("WeightHistory", data);
     });
   } catch (error) {
-    // console.tron.log('error on creation', error.message);
+    console.tron.log("error on creation", error.message);
   }
 
   return true;
@@ -112,7 +152,7 @@ export const insert = (realm, data) => {
 export const bulkInsert = async (realm, data) => {
   const finalData = Object.assign({}, realm);
   try {
-    const promises = [...data].map(async (item) => {
+    const promises = [...data].map(async item => {
       const resultsFromMonth = await searchFromMonth(realm);
       const resultExists = await verifyExists(item, resultsFromMonth);
 
@@ -123,7 +163,28 @@ export const bulkInsert = async (realm, data) => {
 
     await Promise.all(promises);
   } catch (error) {
-    verifyShowError({ error: 'Ops! Erro na inserção de histórico de peso' });
+    verifyShowError({ error: "Ops! Erro na inserção de histórico de peso" });
+  }
+
+  return finalData;
+};
+
+export const bulkInsertFromSearch = async (realm, data) => {
+  const finalData = Object.assign({}, realm);
+  try {
+    const promises = [...data].map(async item => {
+      const resultsGeneral = await listAll(realm);
+
+      const resultExists = await verifyExists(item, resultsGeneral);
+
+      if (resultExists.length === 0) {
+        await insert(realm, item);
+      }
+    });
+
+    await Promise.all(promises);
+  } catch (error) {
+    verifyShowError({ error: "Ops! Erro na inserção de histórico de peso" });
   }
 
   return finalData;
