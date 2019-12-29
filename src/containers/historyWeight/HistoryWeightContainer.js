@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import {
   Container,
   Content,
@@ -7,34 +7,36 @@ import {
   Text,
   Left,
   Body,
-  Picker,
-} from 'native-base';
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import LineChartComponent from '../../components/LineChartComponent';
-import OfflineNotice from '../../components/OfflineNotice';
-import NotFound from '../../components/NotFound';
-import { getRealm } from '../../config/realm';
-import commonStyle from '../../utils/commonStyle';
-import WeightList from './WeightList';
-import ImcList from './ImcList';
-import FabOptions from './FabOptions';
-import SearchModal from './SearchModal';
+  Picker
+} from "native-base";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import LineChartComponent from "../../components/LineChartComponent";
+import OfflineNotice from "../../components/OfflineNotice";
+import NotFound from "../../components/NotFound";
+import { getRealm } from "../../config/realm";
+import commonStyle from "../../utils/commonStyle";
+import WeightList from "./WeightList";
+import ImcList from "./ImcList";
+import FabOptions from "./FabOptions";
+import SearchModal from "./SearchModal";
 import {
   getHistory as getWeightHistory,
   bulkInsert as insertWeightHistory,
   searchFromMonth,
-  mapToChart as mapWeightHistory,
-} from './functions';
+  mapToChart as mapWeightHistory
+} from "./functions";
+import RegisterModal from "./RegisterModal";
 
 class HistoryWeightContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selected: 'chart',
+      selected: "chart",
       visibleModal: false,
+      visibleRegisterModal: false,
       chartData: [],
-      historyData: [],
+      historyData: []
     };
   }
 
@@ -56,12 +58,16 @@ class HistoryWeightContainer extends Component {
     this.loadInitialReport();
   };
 
-  toggleModal = (status) => {
+  toggleModal = status => {
     this.setState({ visibleModal: status });
   };
 
+  toggleRegisterModal = status => {
+    this.setState({ visibleRegisterModal: status });
+  };
+
   render() {
-    const { selected, visibleModal } = this.state;
+    const { selected, visibleModal, visibleRegisterModal } = this.state;
     const { historyData, chartData } = this.state;
 
     return (
@@ -92,7 +98,7 @@ class HistoryWeightContainer extends Component {
                 <Picker.Item label="Visualização em IMC" value="imc" />
               </Picker>
             </CardItem>
-            {selected === 'chart' && (
+            {selected === "chart" && (
               <CardItem>
                 {chartData && chartData.length > 0 ? (
                   <LineChartComponent data={chartData} />
@@ -103,13 +109,13 @@ class HistoryWeightContainer extends Component {
             )}
 
             {/** passar o history data aqui. Depois converter para FlatList */}
-            {selected === 'weight' && (
+            {selected === "weight" && (
               <CardItem>
                 <WeightList data={historyData} />
               </CardItem>
             )}
 
-            {selected === 'imc' && (
+            {selected === "imc" && (
               <CardItem>
                 <ImcList data={historyData} />
               </CardItem>
@@ -120,18 +126,27 @@ class HistoryWeightContainer extends Component {
           visible={visibleModal}
           onClose={() => this.toggleModal(false)}
         />
-        <FabOptions onSearch={this.toggleModal} />
+
+        <RegisterModal
+          visible={visibleRegisterModal}
+          onClose={() => this.toggleRegisterModal(false)}
+        />
+
+        <FabOptions
+          onSearch={this.toggleModal}
+          onShowRegister={this.toggleRegisterModal}
+        />
       </Container>
     );
   }
 }
 
 HistoryWeightContainer.propTypes = {
-  connection: PropTypes.object.isRequired,
+  connection: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
-  connection: state.connection,
+  connection: state.connection
 });
 
 export default connect(mapStateToProps, null)(HistoryWeightContainer);

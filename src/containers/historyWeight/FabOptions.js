@@ -1,14 +1,14 @@
-import React, { Component } from 'react';
-import { Fab, View, Button } from 'native-base';
-import Icon from 'react-native-vector-icons/FontAwesome5';
-import PropTypes from 'prop-types';
-import commonStyle from '../../utils/commonStyle';
+import React, { Component } from "react";
+import { Fab, View, Button } from "native-base";
+import Icon from "react-native-vector-icons/FontAwesome5";
+import PropTypes from "prop-types";
+import commonStyle from "../../utils/commonStyle";
 
 class FabOptions extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      active: false,
+      active: false
     };
   }
 
@@ -19,7 +19,7 @@ class FabOptions extends Component {
 
   render() {
     const { active } = this.state;
-    const { onSearch } = this.props;
+    const { onSearch, onShowRegister } = this.props;
     return (
       <View>
         <Fab
@@ -35,7 +35,10 @@ class FabOptions extends Component {
           <Button style={commonStyle.fabSub} onPress={() => onSearch(true)}>
             <Icon name="search" size={15} />
           </Button>
-          <Button style={commonStyle.fabSub}>
+          <Button
+            style={commonStyle.fabSub}
+            onPress={() => onShowRegister(true)}
+          >
             <Icon name="plus" size={15} />
           </Button>
         </Fab>
@@ -46,6 +49,7 @@ class FabOptions extends Component {
 
 FabOptions.propTypes = {
   onSearch: PropTypes.func.isRequired,
+  onShowRegister: PropTypes.func.isRequired
 };
 
 export default FabOptions;
