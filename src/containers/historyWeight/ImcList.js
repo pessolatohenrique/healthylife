@@ -28,7 +28,7 @@ const ImcItem = ({ item }) => (
         </Badge>
       ) : (
         <Badge danger>
-          <Text>{item.difference_imc}</Text>
+          <Text>{item.difference_imc.toString().replace('-', '')}</Text>
         </Badge>
       )}
     </Right>

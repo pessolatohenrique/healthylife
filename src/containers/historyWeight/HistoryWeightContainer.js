@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
   Container,
   Content,
@@ -7,36 +7,41 @@ import {
   Text,
   Left,
   Body,
-  Picker
-} from "native-base";
-import { connect } from "react-redux";
-import PropTypes from "prop-types";
-import LineChartComponent from "../../components/LineChartComponent";
-import OfflineNotice from "../../components/OfflineNotice";
-import NotFound from "../../components/NotFound";
-import { getRealm } from "../../config/realm";
-import commonStyle from "../../utils/commonStyle";
-import WeightList from "./WeightList";
-import ImcList from "./ImcList";
-import FabOptions from "./FabOptions";
-import SearchModal from "./SearchModal";
+  Picker,
+} from 'native-base';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import moment from 'moment';
+import LineChartComponent from '../../components/LineChartComponent';
+import OfflineNotice from '../../components/OfflineNotice';
+import NotFound from '../../components/NotFound';
+import { getRealm } from '../../config/realm';
+import commonStyle from '../../utils/commonStyle';
+import WeightList from './WeightList';
+import ImcList from './ImcList';
+import FabOptions from './FabOptions';
+import SearchModal from './SearchModal';
+import RegisterModal from './RegisterModal';
+
 import {
   getHistory as getWeightHistory,
   bulkInsert as insertWeightHistory,
+  bulkInsertFromSearch as insertWeightSearch,
+  search as searchWeightHistory,
   searchFromMonth,
-  mapToChart as mapWeightHistory
-} from "./functions";
-import RegisterModal from "./RegisterModal";
+  getHistorySearch,
+  mapToChart as mapWeightHistory,
+} from './functions';
 
 class HistoryWeightContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selected: "chart",
+      selected: 'chart',
       visibleModal: false,
       visibleRegisterModal: false,
       chartData: [],
-      historyData: []
+      historyData: [],
     };
   }
 
@@ -54,15 +59,43 @@ class HistoryWeightContainer extends Component {
     this.setState({ historyData, chartData: mapWeightHistory(historyData) });
   };
 
+  searchReportFlow = async (date_initial, date_final) => {
+    const { connection } = this.props;
+    const realm = await getRealm();
+    const dateInitialFormatted = moment(date_initial, 'DD/MM/YYYY').format(
+      'YYYY-MM-DD',
+    );
+
+    const dateFinalFormatted = moment(date_final, 'DD/MM/YYYY').format(
+      'YYYY-MM-DD',
+    );
+
+    if (connection.status) {
+      const data = await getHistorySearch(
+        dateInitialFormatted,
+        dateFinalFormatted,
+      );
+      await insertWeightSearch(realm, data);
+    }
+
+    const objectSearch = {
+      date_initial: dateInitialFormatted,
+      date_final: dateFinalFormatted,
+    };
+    const historyData = await searchWeightHistory(realm, objectSearch);
+
+    this.setState({ historyData, chartData: mapWeightHistory(historyData) });
+  };
+
   componentDidMount = () => {
     this.loadInitialReport();
   };
 
-  toggleModal = status => {
+  toggleModal = (status) => {
     this.setState({ visibleModal: status });
   };
 
-  toggleRegisterModal = status => {
+  toggleRegisterModal = (status) => {
     this.setState({ visibleRegisterModal: status });
   };
 
@@ -98,7 +131,7 @@ class HistoryWeightContainer extends Component {
                 <Picker.Item label="Visualização em IMC" value="imc" />
               </Picker>
             </CardItem>
-            {selected === "chart" && (
+            {selected === 'chart' && (
               <CardItem>
                 {chartData && chartData.length > 0 ? (
                   <LineChartComponent data={chartData} />
@@ -109,15 +142,23 @@ class HistoryWeightContainer extends Component {
             )}
 
             {/** passar o history data aqui. Depois converter para FlatList */}
-            {selected === "weight" && (
+            {selected === 'weight' && (
               <CardItem>
-                <WeightList data={historyData} />
+                {chartData && chartData.length > 0 ? (
+                  <WeightList data={historyData} />
+                ) : (
+                  <NotFound />
+                )}
               </CardItem>
             )}
 
-            {selected === "imc" && (
+            {selected === 'imc' && (
               <CardItem>
-                <ImcList data={historyData} />
+                {chartData && chartData.length > 0 ? (
+                  <ImcList data={historyData} />
+                ) : (
+                  <NotFound />
+                )}
               </CardItem>
             )}
           </Card>
@@ -125,6 +166,7 @@ class HistoryWeightContainer extends Component {
         <SearchModal
           visible={visibleModal}
           onClose={() => this.toggleModal(false)}
+          onSearch={this.searchReportFlow}
         />
 
         <RegisterModal
@@ -142,11 +184,11 @@ class HistoryWeightContainer extends Component {
 }
 
 HistoryWeightContainer.propTypes = {
-  connection: PropTypes.object.isRequired
+  connection: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = state => ({
-  connection: state.connection
+  connection: state.connection,
 });
 
 export default connect(mapStateToProps, null)(HistoryWeightContainer);

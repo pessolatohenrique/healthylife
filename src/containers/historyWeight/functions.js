@@ -1,7 +1,8 @@
 import Moment from 'moment';
-import { getRequest } from '../../utils/request';
-import { formatDecimalToNumber } from '../../utils/formatters';
-import { verifyShowError } from '../../utils/errors';
+import moment from "moment";
+import { getRequest } from "../../utils/request";
+import { formatDecimalToNumber } from "../../utils/formatters";
+import { verifyShowError } from "../../utils/errors";
 
 /**
  * realiza o mapeamento no formato necessário para a base de dados
@@ -33,6 +34,11 @@ export const mapList = (data) => {
   return finalDataMaped;
 };
 
+/**
+ * realiza o mapeamento para exibir no gráfico de linha
+ * @param {Array} data dados a serem mapeados
+ * @return {Array} dataMaped dados mapeados
+ */
 export const mapToChart = (data) => {
   let lastResults = [...data];
 
@@ -69,6 +75,22 @@ export const getHistory = async () => {
 };
 
 /**
+ * realiza a pesquisa na API com base na data inicial e final
+ * @param {String} date_initial data inicial em formato "DD/MM/YYYY"
+ * @param {String} date_final data final em formato "DD/MM/YYYY"
+ * @return {Array} finalData lista com os dados
+ */
+export const getHistorySearch = async (date_initial, date_final) => {
+  const finalData = await getRequest(
+    `weight-history?HistoricoPesoSearch[data_inicial]=${date_initial}&HistoricoPesoSearch[data_final]=${date_final}`,
+  );
+
+  const finalDataMaped = mapList(finalData);
+
+  return finalDataMaped;
+};
+
+/**
  * verifica se um registro existe na base de dados local
  * @param {Object} currentItem item atual
  * @param {Object} data dados a serem encontrados
@@ -79,6 +101,12 @@ export const verifyExists = async (currentItem, data) => {
   return result;
 };
 
+/**
+ * realiza a pesquisa na base de dados local,
+ * com dados do último mês
+ * @param {Object} realm informações do realm database
+ * @return {Array} result dados da pesquisa
+ */
 export const searchFromMonth = async (realm) => {
   const currentDate = Moment().format('YYYY-MM-DD');
   const dateLastMonth = Moment()
@@ -97,24 +125,96 @@ export const searchFromMonth = async (realm) => {
   return result;
 };
 
+/**
+ * realiza a pesquisa na base de dados local,
+ * com dados parametrizados
+ * @param {Object} realm informações do realm database
+ * @param {Object} objectSearch informacoes da pesquisa
+ * @return {Array} result dados da pesquisa
+ */
+export const search = async (realm, objectSearch) => {
+  const { date_initial, date_final } = objectSearch;
+
+  const result = await realm
+    .objects('WeightHistory')
+    .filtered(
+      'registered_at >= $0 AND registered_at <= $1',
+      date_initial,
+      date_final,
+    )
+    .sorted('registered_at');
+
+  return result;
+};
+
+/**
+ * realiza a pesquisa na base de dados local,
+ * com dados gerais
+ * @param {Object} realm informações do realm database
+ * @return {Array} result dados da pesquisa
+ */
+export const listAll = async (realm) => {
+  const result = await realm.objects('WeightHistory').sorted('id');
+
+  return result;
+};
+
+/**
+ * realiza inserção na base de dados local
+ * @param {Object} realm informações do realm database
+ * @return {Bool} inserted
+ */
 export const insert = (realm, data) => {
   try {
     realm.write(() => {
       realm.create('WeightHistory', data);
     });
   } catch (error) {
-    // console.tron.log('error on creation', error.message);
+    console.tron.log('error on creation', error.message);
   }
 
   return true;
 };
 
+/**
+ * realiza inserção na base de dados local
+ * @param {Object} realm informações do realm database
+ * @param {Array} data dados a serem inseridos
+ * @return {Array} finalData dados inseridos
+ */
 export const bulkInsert = async (realm, data) => {
   const finalData = Object.assign({}, realm);
   try {
     const promises = [...data].map(async (item) => {
       const resultsFromMonth = await searchFromMonth(realm);
       const resultExists = await verifyExists(item, resultsFromMonth);
+
+      if (resultExists.length === 0) {
+        await insert(realm, item);
+      }
+    });
+
+    await Promise.all(promises);
+  } catch (error) {
+    verifyShowError({ error: 'Ops! Erro na inserção de histórico de peso' });
+  }
+
+  return finalData;
+};
+
+/**
+ * realiza inserção na base de dados local
+ * @param {Object} realm informações do realm database
+ * @param {Array} data dados a serem inseridos
+ * @return {Array} finalData dados inseridos
+ */
+export const bulkInsertFromSearch = async (realm, data) => {
+  const finalData = Object.assign({}, realm);
+  try {
+    const promises = [...data].map(async (item) => {
+      const resultsGeneral = await listAll(realm);
+
+      const resultExists = await verifyExists(item, resultsGeneral);
 
       if (resultExists.length === 0) {
         await insert(realm, item);

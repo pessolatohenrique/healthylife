@@ -1,16 +1,14 @@
-import React, { Component } from "react";
-import { Text, View, Button, Item, Input } from "native-base";
-import Modal from "react-native-modal";
-import DatePicker from "react-native-datepicker";
-import PropTypes from "prop-types";
-import { withFormik } from "formik";
-import * as Yup from "yup";
-import moment from "moment";
-import commonStyle from "../../utils/commonStyle";
-import { getDifferenceInDays } from "../../utils/calendar";
-import { verifyValidateDecimal } from "../../utils/formatters";
-import styles from "./styles";
-
+import React, { Component } from 'react';
+import {
+ Text, View, Button, Item, Input 
+} from 'native-base';
+import Modal from 'react-native-modal';
+import PropTypes from 'prop-types';
+import { withFormik } from 'formik';
+import * as Yup from 'yup';
+import commonStyle from '../../utils/commonStyle';
+import { verifyValidateDecimal } from '../../utils/formatters';
+import styles from './styles';
 
 class RegisterModal extends Component {
   render() {
@@ -21,14 +19,14 @@ class RegisterModal extends Component {
       setFieldValue,
       handleSubmit,
       isSubmitting,
-      errors
+      errors,
     } = this.props;
     const { weight } = values;
     return (
       <View>
         <Modal
           isVisible={visible}
-          wipeDirection={["up", "left", "right", "down"]}
+          wipeDirection={['up', 'left', 'right', 'down']}
           style={commonStyle.modalBottom}
         >
           <View style={commonStyle.modalContent}>
@@ -42,7 +40,7 @@ class RegisterModal extends Component {
                 placeholder="Peso"
                 // style={[commonStyle.fieldWidth, commonStyle.fieldMargin, styles.weightField]}
                 value={weight}
-                onChangeText={text => setFieldValue("weight", text)}
+                onChangeText={text => setFieldValue('weight', text)}
               />
             </Item>
 
@@ -74,22 +72,19 @@ RegisterModal.propTypes = {
   setFieldValue: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
-  errors: PropTypes.object.isRequired
+  errors: PropTypes.object.isRequired,
 };
 
 export default withFormik({
-  mapPropsToValues: () => ({ weight: "" }),
+  mapPropsToValues: () => ({ weight: '' }),
   validationSchema: Yup.object().shape({
-    weight: Yup.string().required("O campo peso é obrigatório")
+    weight: Yup.string().required('O campo peso é obrigatório'),
   }),
   handleSubmit: async (values, actions) => {
-    const { registered_at, weight } = values;
+    const { weight } = values;
 
     if (!verifyValidateDecimal(weight)) {
-      actions.setFieldError(
-        'weight',
-        'O campo peso está no formato inválido',
-      );
+      actions.setFieldError('weight', 'O campo peso está no formato inválido');
       actions.setSubmitting(false);
       return false;
     }
@@ -98,5 +93,5 @@ export default withFormik({
     actions.setSubmitting(false);
 
     return true;
-  }
+  },
 })(RegisterModal);
