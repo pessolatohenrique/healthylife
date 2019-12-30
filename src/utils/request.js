@@ -24,3 +24,28 @@ export const getRequest = async (url) => {
 
   return finalData;
 };
+
+/**
+ * realiza uma requisição de qualquer tipo
+ * @param {String} urlString url a ser chamada
+ * @param {Object} parameters possíveis parâmetros a serem enviados
+ * @param {String} method método HTTP
+ * @return {Object} finalData objeto de retorno
+ */
+export const fetchAxios = async (urlString, parameters = {}, method) => {
+  let finalData = null;
+  try {
+    const result = await axios[method](urlString, parameters);
+
+    const { data } = result;
+
+    if (data) {
+      finalData = data;
+    }
+  } catch (e) {
+    console.tron.log('ERROR', e);
+    finalData = Object.assign({ error: 'Ops! Algo deu errado' });
+  }
+
+  return finalData;
+};

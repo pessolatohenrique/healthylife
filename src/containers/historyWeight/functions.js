@@ -1,8 +1,8 @@
+/* eslint-disable indent */
 import Moment from 'moment';
-import moment from "moment";
-import { getRequest } from "../../utils/request";
-import { formatDecimalToNumber } from "../../utils/formatters";
-import { verifyShowError } from "../../utils/errors";
+import { getRequest, fetchAxios } from '../../utils/request';
+import { formatDecimalToNumber } from '../../utils/formatters';
+import { verifyShowError } from '../../utils/errors';
 
 /**
  * realiza o mapeamento no formato necessário para a base de dados
@@ -178,6 +178,55 @@ export const insert = (realm, data) => {
 
 /**
  * realiza inserção na base de dados local
+ * para a tabela de registros (que irá enviar infos para a API)
+ * @param {Object} realm informações do realm database
+ * @return {Bool} inserted
+ */
+export const insertTblRegister = (realm, data) => {
+  try {
+    realm.write(() => {
+      realm.create('WeightHistoryRegister', data);
+    });
+  } catch (error) {
+    console.tron.log('error on creation', error.message);
+  }
+
+  return true;
+};
+
+/**
+ * formata o objeto para a tabela de registro
+ * @param {Object} data objeto a ser formatado
+ * @return {Object} dataFormatted objeto formatado
+ */
+export const prepareDataRegister = data => ({
+  id: Moment().unix(),
+  weight: formatDecimalToNumber(data.weight),
+  registered_at: Moment().format('YYYY-MM-DD'),
+  method: 'POST',
+  sync: false,
+  created_at: new Date(),
+  updated_at: new Date(),
+});
+
+/**
+ * prepara a inserção para a tabela offline
+ * @param {Object} data objeto a ser formatado
+ * @return {Object} dataFormatted objeto formatado
+ */
+export const prepareInsert = data => ({
+  id: Moment().unix(),
+  weight: formatDecimalToNumber(data.weight),
+  registered_at: Moment().format('YYYY-MM-DD'),
+  difference_weight: 0,
+  difference_imc: 0,
+  classification_imc: '',
+  created_at: new Date(),
+  updated_at: new Date(),
+});
+
+/**
+ * realiza inserção na base de dados local
  * @param {Object} realm informações do realm database
  * @param {Array} data dados a serem inseridos
  * @return {Array} finalData dados inseridos
@@ -227,4 +276,62 @@ export const bulkInsertFromSearch = async (realm, data) => {
   }
 
   return finalData;
+};
+
+export const deleteUnsync = async (realm) => {
+  const data = realm
+    .objects('WeightHistory')
+    .filtered('classification_imc = $0', '');
+
+  realm.write(() => {
+    realm.delete(data);
+  });
+
+  return true;
+};
+
+export const mapDataToPost = data => [...data].map(item => ({
+    id: item.id,
+    data_lancamento: Moment(item.registered_at)
+      .format('DD/MM/YYYY')
+      .toString(),
+    peso: item.weight.toString(),
+  }));
+
+export const filterUnsyncPost = async (realm) => {
+    const data = realm
+    .objects('WeightHistoryRegister')
+    .filtered('sync = $0 AND method = $1', false, 'POST');
+
+  return data;
+}
+
+export const updateSync = async (realm,data, current) => {
+  let dataChangeStatus = data.find(sub => sub.id === current.id);
+  dataChangeStatus = { ...dataChangeStatus, sync: true };
+
+  realm.write(() => {
+    realm.create('WeightHistoryRegister', dataChangeStatus, true);
+  });
+
+  return true;
+}
+
+export const getUnsyncToPost = async (realm) => {
+  try {
+    const data = await filterUnsyncPost(realm);
+    const mapedData = await mapDataToPost(data);
+
+    const promises = [...mapedData].map(async (item) => {
+      const response = await fetchAxios('weight-history/create', item, 'post');
+      if (response && !response.error) {
+        await updateSync(realm, data, item);
+      }
+    });
+
+    await Promise.all(promises);
+  } catch (error) {
+    console.tron.log('ERROR', error.message);
+    verifyShowError({ error: 'Ops! Ocorreu algum erro na sincronização' });
+  }
 };

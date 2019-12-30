@@ -89,6 +89,7 @@ export default withFormik({
       return false;
     }
 
+    actions.props.onSave(values);
     actions.props.onClose();
     actions.setSubmitting(false);
 
