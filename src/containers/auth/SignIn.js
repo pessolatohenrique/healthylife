@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import {
-  AsyncStorage, Image, View, Keyboard,
+ AsyncStorage, Image, View, Keyboard 
 } from 'react-native';
 import {
-  Item, Input, Text, Button,
+ Item, Input, Text, Button 
 } from 'native-base';
 import PropTypes from 'prop-types';
 import { withFormik } from 'formik';
@@ -25,12 +25,18 @@ class SignIn extends Component {
 
   render() {
     const {
-      values, setFieldValue, handleSubmit, isSubmitting, errors,
+      values,
+      setFieldValue,
+      handleSubmit,
+      isSubmitting,
+      errors,
     } = this.props;
     const { username, password } = values;
     return (
       <ViewBackground>
-        <View style={[commonStyle.containerCenter, commonStyle.containerMargin]}>
+        <View
+          style={[commonStyle.containerCenter, commonStyle.containerMargin]}
+        >
           <Image
             style={{ width: '98%', height: 150 }}
             resizeMode="contain"
@@ -47,7 +53,9 @@ class SignIn extends Component {
               onChangeText={text => setFieldValue('username', text)}
             />
           </Item>
-          {errors.username && <Text style={commonStyle.error}>{errors.username}</Text>}
+          {errors.username && (
+            <Text style={commonStyle.error}>{errors.username}</Text>
+          )}
 
           <Item regular>
             <Input
@@ -60,7 +68,9 @@ class SignIn extends Component {
               onSubmitEditing={handleSubmit}
             />
           </Item>
-          {errors.password && <Text style={commonStyle.error}>{errors.password}</Text>}
+          {errors.password && (
+            <Text style={commonStyle.error}>{errors.password}</Text>
+          )}
 
           <Button block success onPress={handleSubmit} disabled={isSubmitting}>
             <Text>Login</Text>
@@ -99,7 +109,7 @@ export default withFormik({
 
     if (response.error) {
       actions.setErrors({ message: response.error });
-      return true;
+      return false;
     }
 
     await AsyncStorage.setItem('token', response);

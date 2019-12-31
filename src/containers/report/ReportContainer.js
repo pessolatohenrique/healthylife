@@ -1,20 +1,18 @@
-import React, { Component } from "react";
-import { Image } from "react-native";
+import React, { Component } from 'react';
+import { Image } from 'react-native';
 import {
   Container,
-  Header,
   Content,
   Card,
   CardItem,
-  Thumbnail,
   Text,
   Button,
   Icon,
   Left,
   Body,
-  Right
-} from "native-base";
-import commonStyle from "../../utils/commonStyle";
+  Right,
+} from 'native-base';
+import commonStyle from '../../utils/commonStyle';
 
 class ReportContainer extends Component {
   render() {
@@ -36,7 +34,7 @@ class ReportContainer extends Component {
             </CardItem>
             <CardItem cardBody>
               <Image
-                source={require("../../../assets/imgs/reports.png")}
+                source={require('../../../assets/imgs/reports.png')}
                 style={[commonStyle.imageSection]}
               />
             </CardItem>
@@ -56,7 +54,7 @@ class ReportContainer extends Component {
               <Left>
                 <Button
                   transparent
-                  onPress={() => navigation.navigate("HistoryWeight")}
+                  onPress={() => navigation.navigate('HistoryWeight')}
                 >
                   <Text>Peso e IMC</Text>
                 </Button>
@@ -64,7 +62,7 @@ class ReportContainer extends Component {
               <Right>
                 <Button
                   transparent
-                  onPress={() => navigation.navigate("HistoryWeight")}
+                  onPress={() => navigation.navigate('HistoryWeight')}
                 >
                   <Icon name="arrow-forward" />
                 </Button>
