@@ -1,77 +1,91 @@
-import { StyleSheet } from 'react-native';
-import { MAIN_COLOR } from '../constants/general';
+import { StyleSheet } from "react-native";
+import { MAIN_COLOR } from "../constants/general";
 
 export default StyleSheet.create({
   error: {
     paddingLeft: 10,
     paddingTop: 5,
-    color: 'red',
+    color: "red"
   },
   priorirty: {
-    flex: 1,
+    flex: 1
   },
   header: {
-    backgroundColor: MAIN_COLOR,
+    backgroundColor: MAIN_COLOR
   },
   headerCustomPadding: {
-    paddingLeft: 20,
+    paddingLeft: 20
   },
   fontBold: {
-    fontWeight: 'bold',
+    fontWeight: "bold"
   },
   searchPadding: {
-    paddingLeft: 10,
+    paddingLeft: 10
   },
   containerCenter: {
     flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center"
   },
   containerRowCenter: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center"
   },
   containerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between"
   },
   textCenter: {
-    textAlign: 'center',
+    textAlign: "center"
   },
   colorTheme: {
-    color: MAIN_COLOR,
+    color: MAIN_COLOR
   },
   backgroundImage: {
     flex: 1,
     width: null,
-    height: null,
+    height: null
   },
-  regularInput: { backgroundColor: '#ffffff', marginBottom: 10 },
+  regularInput: { backgroundColor: "#ffffff", marginBottom: 10 },
   containerMargin: { marginLeft: 10, marginRight: 10 },
   imageSection: {
     height: 200,
     width: null,
     flex: 1,
-    resizeMode: 'contain',
+    resizeMode: "contain"
   },
   fabMain: {
-    backgroundColor: MAIN_COLOR,
+    backgroundColor: MAIN_COLOR
+  },
+  tab: {
+    backgroundColor: "white"
+  },
+  tabText: {
+    color: "black"
+  },
+  tabBottomActive: {
+    backgroundColor: MAIN_COLOR
+  },
+  tabPadding: {
+    paddingTop: 15,
+    paddingBottom: 15,
+    backgroundColor: "#adf0e3"
   },
   fabSub: {
-    backgroundColor: '#EAF5F6',
+    backgroundColor: "#EAF5F6"
   },
-  modalBottom: { justifyContent: 'flex-end', margin: 0 },
+  modalBottom: { justifyContent: "flex-end", margin: 0 },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 4,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
+    borderColor: "rgba(0, 0, 0, 0.1)"
   },
-  fieldWidth: { width: '49%' },
-  fieldMargin: { marginRight: 10 },
+  fieldWidth: { width: "49%" },
+  fieldMargin: { marginRight: 10 }
 });

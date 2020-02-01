@@ -102,6 +102,7 @@ const MealFulfilledSchema = {
     food: { type: "Food" },
     consumed_date: "string",
     consumed_time: "string",
+    quantity: "double",
     calories_total: "double",
     created_at: "date",
     updated_at: "date"
