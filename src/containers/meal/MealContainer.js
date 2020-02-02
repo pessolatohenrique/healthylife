@@ -1,26 +1,15 @@
 import React, { Component } from "react";
 import { FlatList } from "react-native";
-import {
-  Container,
-  Content,
-  Card,
-  CardItem,
-  Text,
-  Button,
-  Icon,
-  Left,
-  Body,
-  Right,
-  Tab,
-  Tabs,
-  List,
-  ListItem
-} from "native-base";
+import { Container, Content, Text, Tab, Tabs } from "native-base";
+import { connect } from "react-redux";
+import { getRealm } from "../../config/realm";
 import commonStyle from "../../utils/commonStyle";
 import SyncNotice from "../../components/SyncNotice";
 import Statistics from "./Statistics";
 import MealItem from "./MealItem";
 import FabOptions from "./FabOptions";
+import { loadFoodGroupFlow as syncFoodGroup } from "../foodGroup/functions";
+import { setList as setFoodGroups } from "../../actions/foodGroup";
 
 class MealContainer extends Component {
   constructor(props) {
@@ -42,8 +31,22 @@ class MealContainer extends Component {
       ]
     };
   }
+
+  componentDidMount = async () => {
+    const realm = await getRealm();
+    const { connection, onSetFoodGroups } = this.props;
+
+    const foodGroups = await syncFoodGroup(connection);
+    await onSetFoodGroups(foodGroups);
+
+    console.tron.log(
+      "from database",
+      await realm.objects("FoodGroup").sorted("id")
+    );
+  };
+
   render() {
-    const { navigation } = this.props;
+    const { navigation, foodGroups } = this.props;
     const { data } = this.state;
 
     return (
@@ -111,4 +114,13 @@ class MealContainer extends Component {
   }
 }
 
-export default MealContainer;
+const mapStateToProps = state => ({
+  connection: state.connection,
+  foodGroups: state.foodGroup
+});
+
+const mapDispatchToProps = dispatch => ({
+  onSetFoodGroups: items => dispatch(setFoodGroups(items))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(MealContainer);
