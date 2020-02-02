@@ -9,12 +9,14 @@ import Statistics from "./Statistics";
 import MealItem from "./MealItem";
 import FabOptions from "./FabOptions";
 import { loadFoodGroupFlow as syncFoodGroup } from "../foodGroup/functions";
+import { loadFoodFlow as syncFood } from "../food/functions";
 import { setList as setFoodGroups } from "../../actions/foodGroup";
 
 class MealContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isSynchronizing: false,
       data: [
         {
           id: 1,
@@ -36,18 +38,16 @@ class MealContainer extends Component {
     const realm = await getRealm();
     const { connection, onSetFoodGroups } = this.props;
 
+    this.setState({ isSynchronizing: true });
     const foodGroups = await syncFoodGroup(connection);
     await onSetFoodGroups(foodGroups);
-
-    console.tron.log(
-      "from database",
-      await realm.objects("FoodGroup").sorted("id")
-    );
+    await syncFood(connection, foodGroups);
+    this.setState({ isSynchronizing: false });
   };
 
   render() {
     const { navigation, foodGroups } = this.props;
-    const { data } = this.state;
+    const { data, isSynchronizing } = this.state;
 
     return (
       <Container>
@@ -60,7 +60,7 @@ class MealContainer extends Component {
               activeTabStyle={commonStyle.tab}
               activeTextStyle={commonStyle.tabText}
             >
-              <SyncNotice isSynchronizing />
+              <SyncNotice isSynchronizing={isSynchronizing} />
 
               <Statistics quantity={2} calories={200} />
 
