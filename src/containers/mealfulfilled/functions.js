@@ -83,11 +83,37 @@ export const bulkInsert = async (realm, data) => {
   return finalData;
 };
 
+export const sumQuantity = data => {
+  let sumQuantity = 0;
+  data.map(sub => {
+    sumQuantity = sumQuantity + sub.quantity;
+  });
+
+  return sumQuantity;
+};
+
+export const sumCalories = data => {
+  let sumCalories = 0;
+  data.map(sub => {
+    sumCalories = sumCalories + sub.calories_total;
+  });
+
+  return sumCalories;
+};
+
 export const groupByMealType = async meals => {
   const map = new Map(Array.from(meals, obj => [obj["meal_type"]["id"], []]));
   meals.forEach(obj => map.get(obj["meal_type"]["id"]).push(obj));
   let mealsGrouped = Array.from(map.values());
-  mealsGrouped = [...mealsGrouped].map(item => Object.assign({ items: item }));
+  mealsGrouped = [...mealsGrouped].map(item => {
+    return Object.assign({
+      items: item,
+      totals: {
+        quantity: sumQuantity(item),
+        calories: sumCalories(item)
+      }
+    });
+  });
   return mealsGrouped;
 };
 

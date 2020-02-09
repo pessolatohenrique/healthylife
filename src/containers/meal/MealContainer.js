@@ -4,6 +4,7 @@ import { Container, Content, Text, Tab, Tabs } from "native-base";
 import { connect } from "react-redux";
 import { getRealm } from "../../config/realm";
 import commonStyle from "../../utils/commonStyle";
+import OfflineNotice from "../../components/OfflineNotice";
 import SyncNotice from "../../components/SyncNotice";
 import Statistics from "./Statistics";
 import MealItem from "./MealItem";
@@ -47,8 +48,6 @@ class MealContainer extends Component {
     const { navigation, foodGroups } = this.props;
     const { data, isSynchronizing } = this.state;
 
-    console.tron.log("data", data);
-
     return (
       <Container>
         <Content>
@@ -62,9 +61,13 @@ class MealContainer extends Component {
                   activeTabStyle={commonStyle.tab}
                   activeTextStyle={commonStyle.tabText}
                 >
+                  <OfflineNotice />
                   <SyncNotice isSynchronizing={isSynchronizing} />
 
-                  <Statistics quantity={2} calories={200} />
+                  <Statistics
+                    quantity={data[0].totals.quantity}
+                    calories={data[0].totals.calories}
+                  />
 
                   <FlatList
                     data={data[0].items}
@@ -82,9 +85,13 @@ class MealContainer extends Component {
                   activeTabStyle={commonStyle.tab}
                   activeTextStyle={commonStyle.tabText}
                 >
+                  <OfflineNotice />
                   <SyncNotice isSynchronizing={isSynchronizing} />
 
-                  <Statistics quantity={2} calories={200} />
+                  <Statistics
+                    quantity={data[1].totals.quantity}
+                    calories={data[1].totals.calories}
+                  />
 
                   <FlatList
                     data={data[1].items}
@@ -102,9 +109,13 @@ class MealContainer extends Component {
                   activeTabStyle={commonStyle.tab}
                   activeTextStyle={commonStyle.tabText}
                 >
+                  <OfflineNotice />
                   <SyncNotice isSynchronizing={isSynchronizing} />
 
-                  <Statistics quantity={2} calories={200} />
+                  <Statistics
+                    quantity={data[2].totals.quantity}
+                    calories={data[2].totals.calories}
+                  />
 
                   <FlatList
                     data={data[2].items}
@@ -122,9 +133,13 @@ class MealContainer extends Component {
                   activeTabStyle={commonStyle.tab}
                   activeTextStyle={commonStyle.tabText}
                 >
+                  <OfflineNotice />
                   <SyncNotice isSynchronizing={isSynchronizing} />
 
-                  <Statistics quantity={2} calories={200} />
+                  <Statistics
+                    quantity={data[3].totals.quantity}
+                    calories={data[3].totals.calories}
+                  />
 
                   <FlatList
                     data={data[3].items}
@@ -142,9 +157,13 @@ class MealContainer extends Component {
                   activeTabStyle={commonStyle.tab}
                   activeTextStyle={commonStyle.tabText}
                 >
+                  <OfflineNotice />
                   <SyncNotice isSynchronizing={isSynchronizing} />
 
-                  <Statistics quantity={2} calories={200} />
+                  <Statistics
+                    quantity={data[4].totals.quantity}
+                    calories={data[4].totals.calories}
+                  />
 
                   <FlatList
                     data={data[4].items}
