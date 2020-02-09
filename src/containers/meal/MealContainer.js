@@ -8,8 +8,13 @@ import SyncNotice from "../../components/SyncNotice";
 import Statistics from "./Statistics";
 import MealItem from "./MealItem";
 import FabOptions from "./FabOptions";
+import MealTab from "./MealTab";
 import { loadFoodGroupFlow as syncFoodGroup } from "../foodGroup/functions";
 import { loadFoodFlow as syncFood } from "../food/functions";
+import {
+  loadMealFlow as syncMeal,
+  groupByMealType as groupMeals
+} from "../mealfulfilled/functions";
 import { setList as setFoodGroups } from "../../actions/foodGroup";
 
 class MealContainer extends Component {
@@ -17,20 +22,7 @@ class MealContainer extends Component {
     super(props);
     this.state = {
       isSynchronizing: false,
-      data: [
-        {
-          id: 1,
-          quantity: 1,
-          calories_total: 200,
-          food: {
-            description: "Alfajor de chocolate",
-            measure: "1 unidade (50g)",
-            group: {
-              description: "Açúcares"
-            }
-          }
-        }
-      ]
+      data: []
     };
   }
 
@@ -39,9 +31,15 @@ class MealContainer extends Component {
     const { connection, onSetFoodGroups } = this.props;
 
     this.setState({ isSynchronizing: true });
+
     const foodGroups = await syncFoodGroup(connection);
     await onSetFoodGroups(foodGroups);
     await syncFood(connection, foodGroups);
+
+    const meals = await syncMeal(connection, foodGroups);
+    const mealsGrouped = await groupMeals(meals);
+    this.setState({ data: mealsGrouped });
+
     this.setState({ isSynchronizing: false });
   };
 
@@ -49,64 +47,114 @@ class MealContainer extends Component {
     const { navigation, foodGroups } = this.props;
     const { data, isSynchronizing } = this.state;
 
+    console.tron.log("data", data);
+
     return (
       <Container>
         <Content>
-          <Tabs tabBarUnderlineStyle={commonStyle.tabBottomActive}>
-            <Tab
-              heading="Café da manhã"
-              tabStyle={commonStyle.tab}
-              textStyle={commonStyle.tabText}
-              activeTabStyle={commonStyle.tab}
-              activeTextStyle={commonStyle.tabText}
-            >
-              <SyncNotice isSynchronizing={isSynchronizing} />
+          {data && data.length > 0 && (
+            <Tabs tabBarUnderlineStyle={commonStyle.tabBottomActive}>
+              {data && data[0] && (
+                <Tab
+                  heading={data[0].items[0].meal_type.description}
+                  tabStyle={commonStyle.tab}
+                  textStyle={commonStyle.tabText}
+                  activeTabStyle={commonStyle.tab}
+                  activeTextStyle={commonStyle.tabText}
+                >
+                  <SyncNotice isSynchronizing={isSynchronizing} />
 
-              <Statistics quantity={2} calories={200} />
+                  <Statistics quantity={2} calories={200} />
 
-              <FlatList
-                data={data}
-                renderItem={({ item }) => <MealItem item={item} />}
-                keyExtractor={item => item.id.toString()}
-              />
-            </Tab>
-            <Tab
-              heading="Lanche da manhã"
-              tabStyle={commonStyle.tab}
-              textStyle={commonStyle.tabText}
-              activeTabStyle={commonStyle.tab}
-              activeTextStyle={commonStyle.tabText}
-            >
-              <Text>Lanche da Manhã</Text>
-            </Tab>
-            <Tab
-              heading="Almoço"
-              tabStyle={commonStyle.tab}
-              textStyle={commonStyle.tabText}
-              activeTabStyle={commonStyle.tab}
-              activeTextStyle={commonStyle.tabText}
-            >
-              <Text>Aba 03</Text>
-            </Tab>
-            <Tab
-              heading="Lanche da tarde"
-              tabStyle={commonStyle.tab}
-              textStyle={commonStyle.tabText}
-              activeTabStyle={commonStyle.tab}
-              activeTextStyle={commonStyle.tabText}
-            >
-              <Text>Aba 03</Text>
-            </Tab>
-            <Tab
-              heading="Jantar"
-              tabStyle={commonStyle.tab}
-              textStyle={commonStyle.tabText}
-              activeTabStyle={commonStyle.tab}
-              activeTextStyle={commonStyle.tabText}
-            >
-              <Text>Aba 03</Text>
-            </Tab>
-          </Tabs>
+                  <FlatList
+                    data={data[0].items}
+                    renderItem={({ item }) => <MealItem item={item} />}
+                    keyExtractor={item => item.id.toString()}
+                  />
+                </Tab>
+              )}
+
+              {data && data[1] && (
+                <Tab
+                  heading={data[1].items[0].meal_type.description}
+                  tabStyle={commonStyle.tab}
+                  textStyle={commonStyle.tabText}
+                  activeTabStyle={commonStyle.tab}
+                  activeTextStyle={commonStyle.tabText}
+                >
+                  <SyncNotice isSynchronizing={isSynchronizing} />
+
+                  <Statistics quantity={2} calories={200} />
+
+                  <FlatList
+                    data={data[1].items}
+                    renderItem={({ item }) => <MealItem item={item} />}
+                    keyExtractor={item => item.id.toString()}
+                  />
+                </Tab>
+              )}
+
+              {data && data[2] && (
+                <Tab
+                  heading={data[2].items[0].meal_type.description}
+                  tabStyle={commonStyle.tab}
+                  textStyle={commonStyle.tabText}
+                  activeTabStyle={commonStyle.tab}
+                  activeTextStyle={commonStyle.tabText}
+                >
+                  <SyncNotice isSynchronizing={isSynchronizing} />
+
+                  <Statistics quantity={2} calories={200} />
+
+                  <FlatList
+                    data={data[2].items}
+                    renderItem={({ item }) => <MealItem item={item} />}
+                    keyExtractor={item => item.id.toString()}
+                  />
+                </Tab>
+              )}
+
+              {data && data[3] && (
+                <Tab
+                  heading={data[3].items[0].meal_type.description}
+                  tabStyle={commonStyle.tab}
+                  textStyle={commonStyle.tabText}
+                  activeTabStyle={commonStyle.tab}
+                  activeTextStyle={commonStyle.tabText}
+                >
+                  <SyncNotice isSynchronizing={isSynchronizing} />
+
+                  <Statistics quantity={2} calories={200} />
+
+                  <FlatList
+                    data={data[3].items}
+                    renderItem={({ item }) => <MealItem item={item} />}
+                    keyExtractor={item => item.id.toString()}
+                  />
+                </Tab>
+              )}
+
+              {data && data[4] && (
+                <Tab
+                  heading={data[4].items[0].meal_type.description}
+                  tabStyle={commonStyle.tab}
+                  textStyle={commonStyle.tabText}
+                  activeTabStyle={commonStyle.tab}
+                  activeTextStyle={commonStyle.tabText}
+                >
+                  <SyncNotice isSynchronizing={isSynchronizing} />
+
+                  <Statistics quantity={2} calories={200} />
+
+                  <FlatList
+                    data={data[4].items}
+                    renderItem={({ item }) => <MealItem item={item} />}
+                    keyExtractor={item => item.id.toString()}
+                  />
+                </Tab>
+              )}
+            </Tabs>
+          )}
         </Content>
         <FabOptions onSearch={() => true} onShowRegister={() => true} />
       </Container>

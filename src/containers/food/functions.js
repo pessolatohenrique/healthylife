@@ -60,8 +60,6 @@ export const getMetaData = async () => {
  */
 export const verifyExists = async realm => {
   const result = await realm.objects("Food").sorted("id");
-
-  console.tron.log("RESULT", result);
   return result;
 };
 
@@ -91,7 +89,7 @@ export const loadFoodFlow = async (connection, foodGroups) => {
     for (i = 0; i < metaData.pageCount; i++) {
       let page = i + 1;
       data = await list(page, foodGroups);
-      const inserted = await bulkInsert(realm, data);
+      await bulkInsert(realm, data);
       //   return inserted;
     }
   }

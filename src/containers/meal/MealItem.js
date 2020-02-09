@@ -1,10 +1,15 @@
 import React from "react";
-import { ListItem, Text } from "native-base";
+import { ListItem, Text, Left, Right } from "native-base";
 
 const MealItem = props => (
   <>
     <ListItem itemDivider>
-      <Text>{props.item.food.description}</Text>
+      <Left>
+        <Text>{props.item.food.description}</Text>
+      </Left>
+      <Right>
+        <Text>{props.item.calories_total} kcal</Text>
+      </Right>
     </ListItem>
     <ListItem>
       <Text>{props.item.food.group.description}</Text>
@@ -14,9 +19,6 @@ const MealItem = props => (
     </ListItem>
     <ListItem>
       <Text>Medida caseira: {props.item.food.measure}</Text>
-    </ListItem>
-    <ListItem>
-      <Text>{props.item.calories_total} kcal</Text>
     </ListItem>
   </>
 );
